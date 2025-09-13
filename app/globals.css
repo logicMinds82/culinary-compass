@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Apply fonts */
+body {
+  font-family: var(--font-raleway), sans-serif;
+}
+
+/* Headings with EB Garamond */
+h1, h2, h3, h4, h5, h6, nav a {
+  font-family: var(--font-eb-garamond), sans-serif;
+  font-weight: 600;
+}
