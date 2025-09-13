@@ -35,7 +35,6 @@ const menuItemsLoggedIn: MenuItem[] = [
 
 const Header = () => {
   const auth = useAuth();
-  console.debug('Start')
   const user: User | null = auth?.user || null;
   const logout = auth?.logout || (() => {});
   const menuItems = user ? menuItemsLoggedIn : menuItemsLoggedOut;
