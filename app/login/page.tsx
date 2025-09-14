@@ -5,6 +5,33 @@ import { login, signup, type FormState } from "./actions";
 
 const initialState: FormState = {
   message: "",
+  type: undefined
+};
+
+const getMessageStyling = (type?: FormState['type']) => {
+  switch (type) {
+    case 'error':
+      return "mb-4 p-3 bg-red-900 border border-red-700 text-red-100 rounded flex items-center gap-2";
+    case 'success':
+      return "mb-4 p-3 bg-green-900 border border-green-700 text-green-100 rounded flex items-center gap-2";
+    case 'info':
+      return "mb-4 p-3 bg-blue-900 border border-blue-700 text-blue-100 rounded flex items-center gap-2";
+    default:
+      return "mb-4 p-3 bg-gray-900 border border-gray-700 text-gray-100 rounded flex items-center gap-2";
+  }
+};
+
+const getMessageIcon = (type?: FormState['type']) => {
+  switch (type) {
+    case 'error':
+      return "❌";
+    case 'success':
+      return "✅";
+    case 'info':
+      return "ℹ️";
+    default:
+      return "";
+  }
 };
 
 export default function LoginPage() {
@@ -50,8 +77,9 @@ export default function LoginPage() {
       {activeTab === "login" ? (
         <div>
           {loginState.message && (
-            <div className="mb-4 p-3 bg-red-900 border border-red-700 text-red-100 rounded">
-              {loginState.message}
+            <div className={getMessageStyling(loginState.type)}>
+              <span>{getMessageIcon(loginState.type)}</span>
+              <span>{loginState.message}</span>
             </div>
           )}
           <form className="space-y-4" action={loginFormAction}>
@@ -87,8 +115,9 @@ export default function LoginPage() {
       ) : (
         <div>
           {signupState.message && (
-            <div className="mb-4 p-3 bg-red-900 border border-red-700 text-red-100 rounded">
-              {signupState.message}
+            <div className={getMessageStyling(signupState.type)}>
+              <span>{getMessageIcon(signupState.type)}</span>
+              <span>{signupState.message}</span>
             </div>
           )}
           <form className="space-y-4" action={signupFormAction}>

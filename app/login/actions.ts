@@ -7,6 +7,7 @@ import { createClient } from "@/app/utils/supabase/server";
 
 export type FormState = {
   message: string;
+  type?: 'error' | 'success' | 'info';
 };
 
 export async function login(
@@ -15,12 +16,20 @@ export async function login(
 ): Promise<FormState> {
   const supabase = await createClient();
 
+  // Validate inputs
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  if (!email || !password) {
+    return {
+      message: "Please fill in all fields",
+      type: 'error'
+    };
+  }
+
   // type-casting here for convenience
   // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const data = { email, password };
 
   const { error } = await supabase.auth.signInWithPassword(data);
 
@@ -28,6 +37,7 @@ export async function login(
     console.error(error);
     return {
       message: error.message,
+      type: 'error'
     };
   }
 
@@ -41,13 +51,27 @@ export async function signup(
 ): Promise<FormState> {
   const supabase = await createClient();
 
+  // Validate inputs
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  if (!email || !password) {
+    return {
+      message: "Please fill in all fields",
+      type: 'error'
+    };
+  }
+
+  if (password.length < 6) {
+    return {
+      message: "Password must be at least 6 characters long",
+      type: 'error'
+    };
+  }
+
   // type-casting here for convenience
   // in practice, you should validate your inputs
-  const data = {
-    // fullName: formData.get("fullName") as string,
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const data = { email, password };
 
   const { error } = await supabase.auth.signUp(data);
 
@@ -55,12 +79,13 @@ export async function signup(
     console.error(error);
     return {
       message: error.message,
+      type: 'error'
     };
   }
 
   revalidatePath("/", "layout");
   return {
-    message:
-      "Signup successful! Please check your email to confirm your account.",
+    message: "Signup successful! Please check your email to confirm your account.",
+    type: 'success'
   };
 }

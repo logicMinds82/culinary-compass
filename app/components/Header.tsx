@@ -114,7 +114,7 @@ const Header = () => {
                 onMouseLeave={() => hasSubmenu && handleMouseLeave(uniqueKey || "")}
               >
                 <div className="flex items-center justify-between lg:inline-block">
-                  <Link href={href || "#"} className="px-4 py-2 block flex items-center text-sm lg:text-sm text-red-600 hover:text-red-700" onClick={() => setIsMenuOpen(false)}>
+                  <Link href={href || "#"} className="px-4 py-2 flex items-center text-sm lg:text-sm text-red-600 hover:text-red-700" onClick={() => setIsMenuOpen(false)}>
                     {label}
                     {hasSubmenu && <ChevronDown size={16} className="ml-1 hidden lg:inline" />}
                   </Link>
