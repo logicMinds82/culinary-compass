@@ -5,6 +5,7 @@ import { User } from "@supabase/supabase-js";
 // Define the shape of AuthContext
 interface AuthContextType {
   user: User | null;
+  profile?: { id: string; full_name: string } | null;
 }
 
 // Create context with a default value
@@ -14,14 +15,16 @@ const AuthContext = createContext<AuthContextType | null>(null);
 interface AuthProviderProps {
   children: ReactNode;
   initialUser: User | null;
+  initialProfile?: { id: string; full_name: string } | null;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({
   children,
   initialUser,
+  initialProfile,
 }) => {
   return (
-    <AuthContext.Provider value={{ user: initialUser }}>
+    <AuthContext.Provider value={{ user: initialUser, profile: initialProfile }}>
       {children}
     </AuthContext.Provider>
   );

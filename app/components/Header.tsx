@@ -30,7 +30,7 @@ const menuItemsLoggedIn: MenuItem[] = [
 ];
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const menuItems = user ? menuItemsLoggedIn : menuItemsLoggedOut;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -145,7 +145,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           {user ? (
             <>
-              <span className="hidden text-black lg:inline text-sm">Welcome, {user.email}</span>
+              <span className="hidden text-black lg:inline text-sm">Welcome, {profile?.full_name || user.email}</span>
               <div>
                 <form action="/api/auth/signout" method="POST">
                   <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">

@@ -121,7 +121,7 @@ export default function LoginPage() {
             </div>
           )}
           <form className="space-y-4" action={signupFormAction}>
-            {/* <div>
+            <div>
               <label className="block text-gray-300">Full Name</label>
               <input
                 type="text"
@@ -130,7 +130,7 @@ export default function LoginPage() {
                 className="w-full p-2 rounded bg-gray-700 text-gray-100"
                 required
               />
-            </div> */}
+            </div> 
             <div>
               <label className="block text-gray-300">Email</label>
               <input
