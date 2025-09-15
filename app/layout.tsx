@@ -25,13 +25,29 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  
+  let profile = null;
+  
+  if (user) {
+    const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .eq('id', user.id)
+        .single();
+
+    if (error) {
+      console.error('Error fetching user profile:', error);
+    } else {
+      profile = profileData;
+    }
+  }
 
   return (
     <html lang="en">
       <body
         className={`${ebGaramond.variable} ${raleway.variable} antialiased`}
       >
-        <AuthProvider initialUser={user}>
+        <AuthProvider initialUser={user} initialProfile={profile}>
           <Header />
           <main className="w-full mx-auto">{children}</main>
           <Footer />

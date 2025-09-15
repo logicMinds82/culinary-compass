@@ -34,7 +34,6 @@ export async function login(
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
-    console.error(error);
     return {
       message: error.message,
       type: 'error'
@@ -52,10 +51,11 @@ export async function signup(
   const supabase = await createClient();
 
   // Validate inputs
+  const fullName = formData.get("fullName") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  if (!email || !password) {
+  if (!email || !password || !fullName) {
     return {
       message: "Please fill in all fields",
       type: 'error'
@@ -69,14 +69,20 @@ export async function signup(
     };
   }
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = { email, password };
+  // Include full_name in user metadata
+  const data = { 
+    email, 
+    password,
+    options: {
+      data: {
+        full_name: fullName
+      }
+    }
+  };
 
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    console.error(error);
     return {
       message: error.message,
       type: 'error'
