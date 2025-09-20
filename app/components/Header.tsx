@@ -12,10 +12,6 @@ interface MenuItem {
   submenu?: { label: string; uniqueKey?: string; href: string }[];
 }
 
-interface User {
-  name: string;
-}
-
 const menuItemsLoggedOut: MenuItem[] = [
   { label: "Homepage", uniqueKey: "homepage", href: "/" },
   { label: "Recipes", uniqueKey: "recipes", href: "/recipes" },
@@ -34,9 +30,7 @@ const menuItemsLoggedIn: MenuItem[] = [
 ];
 
 const Header = () => {
-  const auth = useAuth();
-  const user: User | null = auth?.user || null;
-  const logout = auth?.logout || (() => {});
+  const { user, profile } = useAuth();
   const menuItems = user ? menuItemsLoggedIn : menuItemsLoggedOut;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -120,7 +114,7 @@ const Header = () => {
                 onMouseLeave={() => hasSubmenu && handleMouseLeave(uniqueKey || "")}
               >
                 <div className="flex items-center justify-between lg:inline-block">
-                  <Link href={href || "#"} className="px-4 py-2 block flex items-center text-sm lg:text-sm text-red-600 hover:text-red-700" onClick={() => setIsMenuOpen(false)}>
+                  <Link href={href || "#"} className="px-4 py-2 flex items-center text-sm lg:text-sm text-red-600 hover:text-red-700" onClick={() => setIsMenuOpen(false)}>
                     {label}
                     {hasSubmenu && <ChevronDown size={16} className="ml-1 hidden lg:inline" />}
                   </Link>
@@ -151,10 +145,14 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           {user ? (
             <>
-              <span className="hidden text-black lg:inline text-sm">Welcome, {user.name}</span>
-              <button onClick={logout} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">
-                Logout
-              </button>
+              <span className="hidden text-black lg:inline text-sm">Welcome, {profile?.full_name || user.email}</span>
+              <div>
+                <form action="/api/auth/signout" method="POST">
+                  <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">
+                    Logout
+                  </button>
+                </form>
+              </div>
             </>
           ) : (
             <Link href="/login" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">
