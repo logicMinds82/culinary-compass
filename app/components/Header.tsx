@@ -3,7 +3,6 @@ import { useAuth } from "./AuthProvider";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
-import { SiFacebook, SiInstagram, SiLinkedin, SiX } from "react-icons/si"; // X icon instead of Twitter
 
 interface MenuItem {
   label: string;
@@ -15,7 +14,6 @@ interface MenuItem {
 const menuItemsLoggedOut: MenuItem[] = [
   { label: "Homepage", uniqueKey: "homepage", href: "/" },
   { label: "Recipes", uniqueKey: "recipes", href: "/recipes" },
-  { label: "Submit Recipe", uniqueKey: "submitRecipe", href: "/submit-recipe" },
   { label: "News", uniqueKey: "news", href: "/news" },
   { label: "Contacts", uniqueKey: "contactUs", href: "/contactus" },
 ];
@@ -61,27 +59,6 @@ const Header = () => {
 
   return (
     <>
-      {/* TOP BAR */}
-      <div className="bg-stone-100 text-black py-2 px-4 flex justify-between items-center text-sm lg:text-base">
-        {/* Email: Label is text, email itself is a clickable link */}
-        <p className="hidden lg:block">
-          Email: <Link href="mailto:contact@example.com" className="text-black hover:text-red-700 transition">contact@example.com</Link>
-        </p>
-
-        {/* Social Icons (Updated X icon) */}
-        <div className="flex gap-4 mx-auto lg:mx-0">
-          <Link href="#" className="hover:text-red-700"><SiFacebook size={20} /></Link>
-          <Link href="#" className="hover:text-red-700"><SiX size={20} /></Link> {/* X instead of Twitter */}
-          <Link href="#" className="hover:text-red-700"><SiInstagram size={20} /></Link>
-          <Link href="#" className="hover:text-red-700"><SiLinkedin size={20} /></Link>
-        </div>
-
-        {/* Mobile Email (Label stays text, email is clickable) */}
-        <p className="block lg:hidden text-center w-full mt-2">
-          Email: <Link href="mailto:contact@example.com" className="text-black hover:text-red-700 transition">contact@example.com</Link>
-        </p>
-      </div>
-
       {/* MAIN HEADER */}
       <header className="bg-white text-red-600 py-2 px-4 flex justify-between items-center relative z-50 pt-10 pb-10">
         <div>
