@@ -1,443 +1,64 @@
 import { NextResponse } from "next/server";
-
-// Sample 3 predefined recipes
-const recipes = [
-  {
-    id: 1,
-    slug: "classic-spaghetti-carbonara",
-    title: "Classic Spaghetti Carbonara",
-    image: "/images/recipes/recipe1.jpg",
-    description: "A traditional Italian pasta dish with eggs, cheese, pancetta, and pepper.",
-    difficulty: "Medium",
-    cookingTime: "25 minutes",
-    servings: 2,
-    categories: ["Italian", "Pasta"],
-    ingredients: [
-      "200g spaghetti",
-      "100g pancetta",
-      "2 large eggs",
-      "50g Parmesan cheese",
-      "1 clove garlic",
-      "Salt & black pepper to taste",
-    ],
-    steps: [
-      "Cook spaghetti in salted boiling water until al dente.",
-      "Fry pancetta until crispy in a pan with garlic.",
-      "Beat eggs with grated Parmesan and black pepper.",
-      "Drain pasta and mix with pancetta and egg mixture.",
-      "Serve immediately with extra Parmesan.",
-    ],
-    ratings: 4.8,
-    reviews: 125,
-    author: "John Doe",
-    dateAdded: "2024-03-06",
-  },
-  {
-    id: 2,
-    slug: "homemade-margherita-pizza",
-    title: "Homemade Margherita Pizza",
-    image: "/images/recipes/recipe2.jpg",
-    description: "A classic pizza with tomato sauce, mozzarella, and fresh basil.",
-    difficulty: "Easy",
-    cookingTime: "15 minutes",
-    servings: 4,
-    categories: ["Italian", "Pizza"],
-    ingredients: [
-      "1 pizza dough",
-      "150g mozzarella cheese",
-      "100g tomato sauce",
-      "Fresh basil leaves",
-      "Olive oil",
-      "Salt & pepper",
-    ],
-    steps: [
-      "Preheat oven to 220°C (430°F).",
-      "Roll out pizza dough and place on a baking sheet.",
-      "Spread tomato sauce and top with mozzarella slices.",
-      "Bake for 10-12 minutes until golden and bubbly.",
-      "Top with fresh basil and drizzle with olive oil before serving.",
-    ],
-    ratings: 4.6,
-    reviews: 89,
-    author: "Jane Smith",
-    dateAdded: "2024-03-05",
-  },
-  {
-    id: 3,
-    slug: "thai-green-curry-chicken",
-    title: "Thai Green Curry Chicken",
-    image: "/images/recipes/recipe3.jpg",
-    description: "A spicy and flavorful Thai green curry with tender chicken.",
-    difficulty: "Hard",
-    cookingTime: "40 minutes",
-    servings: 3,
-    categories: ["Thai", "Curry"],
-    ingredients: [
-      "2 chicken breasts, sliced",
-      "2 tbsp green curry paste",
-      "400ml coconut milk",
-      "1 red bell pepper, sliced",
-      "100g green beans",
-      "Fresh coriander & lime for garnish",
-    ],
-    steps: [
-      "Heat oil in a pan and fry the green curry paste.",
-      "Add sliced chicken and cook until lightly browned.",
-      "Pour in coconut milk and simmer for 20 minutes.",
-      "Add bell peppers and green beans, cook for 5 more minutes.",
-      "Serve with steamed jasmine rice and garnish with coriander & lime.",
-    ],
-    ratings: 4.9,
-    reviews: 150,
-    author: "Emily Williams",
-    dateAdded: "2024-03-04",
-  },
-
-  {
-    id: 4,
-    slug: "french-toast",
-    title: "French Toast",
-    image: "/images/recipes/recipe4.jpg",
-    description: "Golden brown French toast with cinnamon and syrup.",
-    difficulty: "Easy",
-    cookingTime: "20 minutes",
-    servings: 2,
-    categories: ["Breakfast", "Dessert"],
-    ingredients: ["Bread", "Eggs", "Milk", "Cinnamon", "Maple syrup"],
-    steps: ["Whisk eggs and milk", "Soak bread", "Cook on skillet", "Serve"],
-    ratings: 4.5,
-    reviews: 70,
-    author: "Alice Johnson",
-    dateAdded: "2024-03-03",
-  },
-  {
-    id: 5,
-    slug: "bbq-ribs",
-    title: "BBQ Ribs",
-    image: "/images/recipes/recipe5.jpg",
-    description: "Tender BBQ ribs with smoky sauce.",
-    difficulty: "Medium",
-    cookingTime: "90 minutes",
-    servings: 4,
-    categories: ["BBQ", "Dinner"],
-    ingredients: ["Pork ribs", "BBQ sauce", "Spices"],
-    steps: ["Season ribs", "Slow cook", "Apply sauce", "Grill ribs"],
-    ratings: 4.7,
-    reviews: 95,
-    author: "Mark Lee",
-    dateAdded: "2024-03-02",
-  },
-  {
-    id: 6,
-    slug: "chocolate-brownies",
-    title: "Chocolate Brownies",
-    image: "/images/recipes/recipe6.jpg",
-    description: "Rich and fudgy chocolate brownies.",
-    difficulty: "Easy",
-    cookingTime: "35 minutes",
-    servings: 8,
-    categories: ["Dessert", "Baking"],
-    ingredients: ["Chocolate", "Butter", "Sugar", "Flour", "Eggs"],
-    steps: ["Preheat oven", "Mix ingredients", "Bake", "Cool and serve"],
-    ratings: 4.8,
-    reviews: 110,
-    author: "Sophia Brown",
-    dateAdded: "2024-03-01",
-  },
-  {
-    id: 7,
-    slug: "greek-salad",
-    title: "Greek Salad",
-    image: "/images/recipes/recipe7.jpg",
-    description: "Fresh Greek salad with feta and olives.",
-    difficulty: "Easy",
-    cookingTime: "10 minutes",
-    servings: 3,
-    categories: ["Salad", "Vegetarian"],
-    ingredients: ["Tomatoes", "Cucumber", "Feta cheese", "Olives", "Olive oil"],
-    steps: ["Chop veggies", "Mix ingredients", "Add dressing", "Serve chilled"],
-    ratings: 4.6,
-    reviews: 60,
-    author: "Olivia Martin",
-    dateAdded: "2024-02-29",
-  },
-  {
-    id: 8,
-    slug: "vegan-avocado-toast",
-    title: "Vegan Avocado Toast",
-    image: "/images/recipes/recipe8.jpg",
-    description: "Healthy and delicious vegan avocado toast topped with fresh tomatoes.",
-    difficulty: "Easy",
-    cookingTime: "10 minutes",
-    servings: 2,
-    categories: ["Vegan", "Breakfast"],
-    ingredients: ["Whole grain bread", "Avocado", "Cherry tomatoes", "Lemon juice", "Salt & pepper"],
-    steps: ["Toast bread", "Mash avocado", "Slice tomatoes", "Assemble and season"],
-    ratings: 4.7,
-    reviews: 80,
-    author: "Emma Green",
-    dateAdded: "2024-02-28",
-  },
-  {
-    id: 9,
-    slug: "blueberry-pancakes",
-    title: "Blueberry Pancakes",
-    image: "/images/recipes/recipe9.jpg",
-    description: "Fluffy pancakes bursting with fresh blueberries.",
-    difficulty: "Easy",
-    cookingTime: "20 minutes",
-    servings: 4,
-    categories: ["Breakfast", "Dessert"],
-    ingredients: ["Flour", "Blueberries", "Milk", "Eggs", "Maple syrup"],
-    steps: ["Prepare batter", "Fold in blueberries", "Cook pancakes", "Serve with syrup"],
-    ratings: 4.9,
-    reviews: 120,
-    author: "Lucas Carter",
-    dateAdded: "2024-02-27",
-  },
-  {
-    id: 10,
-    slug: "chicken-alfredo-fettuccine",
-    title: "Chicken Alfredo Fettuccine",
-    image: "/images/recipes/recipe10.jpg",
-    description: "Creamy fettuccine alfredo with grilled chicken breasts.",
-    difficulty: "Medium",
-    cookingTime: "35 minutes",
-    servings: 4,
-    categories: ["Italian", "Pasta"],
-    ingredients: ["Fettuccine", "Chicken breasts", "Cream", "Parmesan cheese", "Garlic", "Parsley"],
-    steps: ["Cook pasta", "Grill chicken", "Prepare alfredo sauce", "Combine pasta, sauce, and chicken"],
-    ratings: 4.7,
-    reviews: 130,
-    author: "Sophia Reed",
-    dateAdded: "2024-02-26",
-  },
-  {
-    id: 11,
-    slug: "mediterranean-quinoa-salad",
-    title: "Mediterranean Quinoa Salad",
-    image: "/images/recipes/recipe11.jpg",
-    description: "Healthy quinoa salad loaded with fresh Mediterranean flavors.",
-    difficulty: "Easy",
-    cookingTime: "25 minutes",
-    servings: 4,
-    categories: ["Salad", "Vegetarian"],
-    ingredients: ["Quinoa", "Cucumbers", "Tomatoes", "Feta cheese", "Olives", "Lemon dressing"],
-    steps: ["Cook quinoa", "Chop vegetables", "Combine all ingredients", "Toss with dressing"],
-    ratings: 4.6,
-    reviews: 85,
-    author: "Ethan Brooks",
-    dateAdded: "2024-02-25",
-  },
-  {
-    id: 12,
-    slug: "beef-bourguignon",
-    title: "Beef Bourguignon",
-    image: "/images/recipes/recipe12.jpg",
-    description: "Classic French stew of beef braised in red wine and beef stock.",
-    difficulty: "Hard",
-    cookingTime: "180 minutes",
-    servings: 4,
-    categories: ["French", "Dinner"],
-    ingredients: ["Beef chuck", "Red wine", "Carrots", "Onions", "Mushrooms", "Beef stock"],
-    steps: ["Brown beef", "Add vegetables and wine", "Simmer gently", "Serve hot"],
-    ratings: 4.9,
-    reviews: 160,
-    author: "Oliver Stone",
-    dateAdded: "2024-02-24",
-  },
-  {
-    id: 13,
-    slug: "lemon-garlic-salmon",
-    title: "Lemon Garlic Salmon",
-    image: "/images/recipes/recipe13.jpg",
-    description: "Oven-baked salmon fillets with fresh lemon and garlic butter.",
-    difficulty: "Easy",
-    cookingTime: "20 minutes",
-    servings: 2,
-    categories: ["Seafood", "Dinner"],
-    ingredients: ["Salmon fillets", "Garlic", "Lemon", "Butter", "Dill"],
-    steps: ["Prepare salmon", "Mix lemon garlic butter", "Bake salmon", "Serve immediately"],
-    ratings: 4.8,
-    reviews: 105,
-    author: "Charlotte King",
-    dateAdded: "2024-02-23",
-  },
-{
-    id: 14,
-    slug: "chicken-tikka-masala",
-    title: "Chicken Tikka Masala",
-    image: "/images/recipes/recipe14.jpg",
-    description: "Rich and creamy Indian chicken tikka masala.",
-    difficulty: "Medium",
-    cookingTime: "50 minutes",
-    servings: 4,
-    categories: ["Indian", "Dinner"],
-    ingredients: ["Chicken breast", "Yogurt", "Tomato puree", "Spices", "Cream"],
-    steps: ["Marinate chicken", "Cook chicken", "Prepare sauce", "Combine and simmer"],
-    ratings: 4.9,
-    reviews: 175,
-    author: "Ayesha Patel",
-    dateAdded: "2024-02-22",
-  },
-  {
-    id: 15,
-    slug: "caprese-salad",
-    title: "Caprese Salad",
-    image: "/images/recipes/recipe15.jpg",
-    description: "Simple Italian salad of fresh mozzarella, tomatoes, and basil.",
-    difficulty: "Easy",
-    cookingTime: "10 minutes",
-    servings: 2,
-    categories: ["Salad", "Italian"],
-    ingredients: ["Mozzarella cheese", "Tomatoes", "Fresh basil", "Olive oil", "Balsamic glaze"],
-    steps: ["Slice mozzarella and tomatoes", "Arrange on plate", "Add basil", "Drizzle oil and glaze"],
-    ratings: 4.7,
-    reviews: 90,
-    author: "Marco Russo",
-    dateAdded: "2024-02-21",
-  },
-  {
-    id: 16,
-    slug: "pumpkin-soup",
-    title: "Pumpkin Soup",
-    image: "/images/recipes/recipe16.jpg",
-    description: "Smooth and flavorful pumpkin soup perfect for chilly days.",
-    difficulty: "Easy",
-    cookingTime: "40 minutes",
-    servings: 4,
-    categories: ["Soup", "Vegetarian"],
-    ingredients: ["Pumpkin", "Onion", "Vegetable stock", "Cream", "Nutmeg"],
-    steps: ["Cook vegetables", "Blend ingredients", "Simmer gently", "Serve hot"],
-    ratings: 4.6,
-    reviews: 78,
-    author: "Hannah Kim",
-    dateAdded: "2024-02-20",
-  },
-  {
-    id: 17,
-    slug: "banana-bread",
-    title: "Banana Bread",
-    image: "/images/recipes/recipe17.jpg",
-    description: "Moist and delicious banana bread with walnuts.",
-    difficulty: "Easy",
-    cookingTime: "60 minutes",
-    servings: 8,
-    categories: ["Baking", "Dessert"],
-    ingredients: ["Ripe bananas", "Flour", "Sugar", "Butter", "Walnuts"],
-    steps: ["Mash bananas", "Mix ingredients", "Pour into pan", "Bake in oven"],
-    ratings: 4.8,
-    reviews: 140,
-    author: "Liam Parker",
-    dateAdded: "2024-02-19",
-  },
-  {
-    id: 18,
-    slug: "mushroom-risotto",
-    title: "Mushroom Risotto",
-    image: "/images/recipes/recipe18.jpg",
-    description: "Creamy risotto with sautéed mushrooms and Parmesan.",
-    difficulty: "Medium",
-    cookingTime: "45 minutes",
-    servings: 3,
-    categories: ["Italian", "Vegetarian"],
-    ingredients: ["Arborio rice", "Mushrooms", "Parmesan", "White wine", "Vegetable stock"],
-    steps: ["Sauté mushrooms", "Cook rice", "Gradually add stock", "Stir in cheese and serve"],
-    ratings: 4.7,
-    reviews: 115,
-    author: "Isabella Rossi",
-    dateAdded: "2024-02-18",
-  },
-  {
-    id: 19,
-    slug: "shrimp-scampi-pasta",
-    title: "Shrimp Scampi Pasta",
-    image: "/images/recipes/recipe19.jpg",
-    description: "Garlic butter shrimp tossed with spaghetti, lemon, and parsley.",
-    difficulty: "Medium",
-    cookingTime: "30 minutes",
-    servings: 4,
-    categories: ["Seafood", "Italian"],
-    ingredients: ["Spaghetti", "Shrimp", "Garlic", "Butter", "Lemon", "Parsley"],
-    steps: ["Cook pasta", "Sauté shrimp and garlic", "Combine with butter and lemon", "Toss with pasta and parsley"],
-    ratings: 4.8,
-    reviews: 140,
-    author: "Mia Lopez",
-    dateAdded: "2024-02-20",
-  },
-  {
-    id: 20,
-    slug: "vegetarian-lasagna",
-    title: "Vegetarian Lasagna",
-    image: "/images/recipes/recipe20.jpg",
-    description: "Layered lasagna with fresh vegetables and cheese.",
-    difficulty: "Medium",
-    cookingTime: "60 minutes",
-    servings: 6,
-    categories: ["Italian", "Vegetarian"],
-    ingredients: ["Lasagna noodles", "Tomato sauce", "Ricotta", "Spinach", "Mozzarella"],
-    steps: ["Prepare noodles", "Layer ingredients", "Bake lasagna", "Let cool and serve"],
-    ratings: 4.6,
-    reviews: 102,
-    author: "Daniel Wilson",
-    dateAdded: "2024-02-25",
-  },
-];
-
-
-
+import { createClient } from "../../utils/supabase/server";
 // GET method
 //   - If no `slug`, return array of all recipes
 //   - If `?slug=some-slug`, return single recipe or 404
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const slugParam = url.searchParams.get("slug");
-  const idsParam = url.searchParams.get("ids");
-
-  // 1) If ?ids=1,2,3 => Return only those IDs
-  if (idsParam) {
-    const requestedIds = idsParam.split(",").map((id) => parseInt(id, 10));
-    const filtered = recipes.filter((r) => requestedIds.includes(r.id));
-    return NextResponse.json(filtered);
-  }
-
-  // 2) If ?slug=some-slug => Return one matching recipe
-  if (slugParam) {
-    const found = recipes.find((r) => r.slug === slugParam);
-    if (!found) {
-      return NextResponse.json(
-        { message: `Recipe with slug '${slugParam}' not found.` },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json(found);
-  }
-
-  // 3) Otherwise => Return ALL recipes
-  return NextResponse.json(recipes);
-}
-
-// POST method - mock adding a new recipe
-export async function POST(req: Request) {
   try {
-    const newRecipe = await req.json();
-    newRecipe.id = recipes.length + 1;
-    newRecipe.dateAdded = new Date().toISOString().split("T")[0];
+    const supabase = await createClient();
+    const url = new URL(req.url);
+    const slugParam = url.searchParams.get("slug");
+    const idsParam = url.searchParams.get("ids");
 
-    // auto-generate slug if not provided
-    if (!newRecipe.slug) {
-      newRecipe.slug =
-        newRecipe.title?.toLowerCase().replace(/\s+/g, "-") ||
-        `recipe-${newRecipe.id}`;
+    // 1) If ?ids=1,2,3 => Return only those IDs
+    if (idsParam) {
+      const requestedIds = idsParam.split(",").map((id) => parseInt(id, 10));
+      const { data: filtered, error } = await supabase
+        .from("recipes")
+        .select("*")
+        .in("id", requestedIds);
+
+      if (error) {
+        console.error("Error fetching recipes by IDs:", error);
+        return NextResponse.json({ message: "Error fetching recipes" }, { status: 500 });
+      }
+
+      return NextResponse.json(filtered);
     }
 
-    recipes.push(newRecipe);
-    return NextResponse.json({
-      message: "Recipe successfully added!",
-      newRecipe,
-    });
-  } catch {
-    return NextResponse.json({ message: "Error adding recipe" }, { status: 500 });
+    // 2) If ?slug=some-slug => Return one matching recipe
+    if (slugParam) {
+      const { data: found, error } = await supabase
+        .from("recipes")
+        .select("*")
+        .eq("slug", slugParam)
+        .single();
+
+      if (error) {
+        console.error("Error fetching recipe by slug:", error);
+        return NextResponse.json(
+          { message: `Recipe with slug '${slugParam}' not found.` },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(found);
+    }
+
+    // 3) Otherwise => Return ALL recipes
+    const { data: allRecipes, error } = await supabase
+      .from("recipes")
+      .select("*")
+      .order("id");
+
+    if (error) {
+      console.error("Error fetching all recipes:", error);
+      return NextResponse.json({ message: "Error fetching recipes" }, { status: 500 });
+    }
+
+    return NextResponse.json(allRecipes);
+  } catch (error) {
+    console.error("Unexpected error in GET /api/recipes:", error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
-
