@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { ZodError } from "zod";
 
 import { createClient } from "@/app/utils/supabase/server";
-import { loginSchema, signupSchema } from "./schemas";
+import { loginSchema, signupSchema } from "@/app/schemas/authSchema";
 
 export type FormState = {
   message: string;

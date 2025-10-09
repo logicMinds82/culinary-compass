@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, AlertCircle, CheckCircle, Info, Loader2 } from "lucide-react";
-import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } from "./schemas";
-import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
+import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } from "../schemas/authSchema";
+import { PasswordStrengthIndicator } from "../components/login/PasswordStrengthIndicator";
 import type { AuthApiResponse } from "../api/auth/types";
 
 type MessageType = 'error' | 'success' | 'info';
