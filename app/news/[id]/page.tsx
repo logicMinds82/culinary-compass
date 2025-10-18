@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import { Card } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 
 // Define the expected type for a news item
@@ -57,10 +58,10 @@ const NewsDetail = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-stone-100 py-10">
+    <div className="w-full min-h-screen bg-background py-10">
       <div className="px-6 w-full max-w-5xl mx-auto">
-        <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
-          <h1 className="text-4xl font-bold text-black mb-4">
+        <Card className="bg-background-alt border border-border p-6 rounded-lg shadow-sm">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             {newsItem.title}
           </h1>
 
@@ -74,8 +75,8 @@ const NewsDetail = () => {
           />
 
           {/* Date Section */}
-          <div className="inline-flex items-center space-x-2 bg-white border border-gray-200 py-1 px-3 rounded-md text-sm text-gray-700 shadow-sm mb-6">
-            <Calendar size={18} className="text-red-600" />
+          <div className="inline-flex items-center space-x-2 bg-background-alt border border-border py-1 px-3 rounded-md text-sm text-muted-foreground shadow-sm mb-6">
+            <Calendar size={18} className="text-primary" />
             <span>
               {new Date(newsItem.date).toLocaleDateString("en-US", {
                 weekday: "long",
@@ -87,8 +88,8 @@ const NewsDetail = () => {
           </div>
 
           {/* Article Content */}
-          <p className="text-gray-700 leading-relaxed">{newsItem.content}</p>
-        </div>
+          <p className="text-muted-foreground leading-relaxed">{newsItem.content}</p>
+        </Card>
       </div>
     </div>
   );

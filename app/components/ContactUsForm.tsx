@@ -1,6 +1,12 @@
 'use client';
 import { useState, FormEvent } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, AlertCircle } from "lucide-react";
 
 export default function ContactUsForm() {
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -40,56 +46,75 @@ export default function ContactUsForm() {
   };
 
   return (
-    <section className="w-full min-h-screen bg-stone-100 py-16">
+    <section className="w-full min-h-screen bg-background py-16">
       <div className="max-w-3xl mx-auto px-6">
-        <h2 className="text-4xl font-bold text-black mb-6">Contact Us</h2>
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-4xl">Contact Us</CardTitle>
+            <CardDescription>We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {status && (
+              <div className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${
+                status.includes('success') 
+                  ? 'bg-success/10 border border-success/20 text-success' 
+                  : 'bg-destructive/10 border border-destructive/20 text-destructive'
+              }`}>
+                {status.includes('success') ? (
+                  <CheckCircle className="w-5 h-5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5" />
+                )}
+                <span className="font-semibold">{status}</span>
+              </div>
+            )}
 
-        {status && <div className="mb-4 text-green-600 font-semibold">{status}</div>}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Your Name"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
 
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-8 space-y-6">
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Name</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="Your Name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Email</label>
-            <input
-              type="email"
-              className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="you@example.com"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  rows={6}
+                  placeholder="Your Message"
+                  required
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+              </div>
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Message</label>
-            <textarea
-              rows={6}
-              className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="Your Message"
-              required
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-md font-semibold transition"
-          >
-            Send Message
-          </button>
-        </form>
+              <Button
+                type="submit"
+                className="bg-primary hover:bg-primary-hover w-full sm:w-auto"
+              >
+                Send Message
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

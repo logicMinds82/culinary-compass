@@ -1,10 +1,12 @@
 "use client";
 
-import Image from "next/image";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+import { ChefHat } from "lucide-react";
 
 // Testimonial Data
 const testimonials = [
@@ -14,7 +16,7 @@ const testimonials = [
     avatar: "/images/user1.jpg",
     rating: 5,
     review:
-      "TishRecipeHub keeps me motivated! I love seeing my progress tracked in real-time.",
+      "Culinary Compass keeps me motivated! I love seeing my progress tracked in real-time.",
   },
   {
     id: 2,
@@ -38,7 +40,7 @@ const testimonials = [
     avatar: "/images/user4.jpg",
     rating: 5,
     review:
-      "TishRecipeHub made finding and storing my recipes so easy. The user interface is amazing!",
+      "Culinary Compass made finding and storing my recipes so easy. The user interface is amazing!",
   },
 ];
 
@@ -71,20 +73,17 @@ const Testimonials = () => {
                 <div className="p-2 w-full h-full overflow-visible">
                   <div className="transition-all duration-300 hover:scale-[1.03] hover:shadow-lg w-full h-full bg-white p-8 rounded-lg border border-gray-200 text-center flex flex-col justify-between min-h-[360px]">
                     {/* Avatar */}
-                    <Image
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      width={90}
-                      height={90}
-                      className="rounded-full mx-auto mb-4 border-4 border-red-600 object-cover"
-                      priority
-                    />
+                    <Avatar className="mx-auto mb-4 size-24 border-4 border-accent">
+                      <AvatarFallback>
+                        <ChefHat size={48} className="text-primary" />
+                      </AvatarFallback>
+                    </Avatar>
                     {/* Name */}
-                    <h3 className="text-2xl font-semibold mb-2 text-black">
+                    <h3 className="text-2xl font-semibold mb-2 text-foreground">
                       {testimonial.name}
                     </h3>
                     {/* Rating */}
-                    <div className="flex justify-center mb-3">
+                    <div className="flex justify-center mb-3" aria-label={`Rating: ${testimonial.rating} out of 5`}>
                       {Array.from({ length: testimonial.rating }, (_, i) => (
                         <span
                           key={`${testimonial.id}-${i}`}
@@ -95,7 +94,7 @@ const Testimonials = () => {
                       ))}
                     </div>
                     {/* Review */}
-                    <p className="text-gray-600 text-lg">{testimonial.review}</p>
+                    <p className="text-muted-foreground text-lg">{testimonial.review}</p>
                   </div>
                 </div>
               </SwiperSlide>
@@ -110,7 +109,7 @@ const Testimonials = () => {
       {/* Custom Swiper Pagination Styling */}
       <style jsx global>{`
         .custom-pagination .swiper-pagination-bullet {
-          background: #dc2626 !important;
+          background: var(--accent) !important;
           opacity: 0.5;
           width: 12px;
           height: 12px;

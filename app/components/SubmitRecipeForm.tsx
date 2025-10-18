@@ -1,11 +1,33 @@
-'use client';
+"use client";
 
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent, useEffect } from "react";
 import Image from "next/image";
-import { postRecipeAction } from '../actions/postRecipeAction';
-import { useAuth } from './AuthProvider';
-import { DifficultyEnum } from '../types/DifficultyEnum';
-import { CategoryEnum } from '../types/CategoryEnum';
+import { postRecipeAction } from "../actions/postRecipeAction";
+import { useAuth } from "./AuthProvider";
+import { DifficultyEnum } from "../types/DifficultyEnum";
+import { CategoryEnum } from "../types/CategoryEnum";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, Plus, X, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function SubmitRecipeForm() {
   const { user } = useAuth();
@@ -13,12 +35,18 @@ export default function SubmitRecipeForm() {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [statusType, setStatusType] = useState<"success" | "error" | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
+  const [difficulty, setDifficulty] = useState<DifficultyEnum>(
+    DifficultyEnum.Easy
+  );
   const [categories, setCategories] = useState<CategoryEnum[]>([]);
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [steps, setSteps] = useState<string[]>([]);
-  const [currentIngredient, setCurrentIngredient] = useState('');
-  const [currentStep, setCurrentStep] = useState('');
+  const [currentIngredient, setCurrentIngredient] = useState("");
+  const [currentStep, setCurrentStep] = useState("");
 
   useEffect(() => {
     if (image) {
@@ -33,237 +61,443 @@ export default function SubmitRecipeForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) {
-      setStatus('Please sign in first.');
+      setStatus("Please sign in first.");
+      setStatusType("error");
       return;
     }
 
     if (categories.length === 0) {
-      setStatus('Please select at least one category.');
+      setStatus("Please select at least one category.");
+      setStatusType("error");
       return;
     }
 
     if (ingredients.length === 0) {
-      setStatus('Please add at least one ingredient.');
+      setStatus("Please add at least one ingredient.");
+      setStatusType("error");
       return;
     }
 
     if (steps.length === 0) {
-      setStatus('Please add at least one instruction step.');
+      setStatus("Please add at least one instruction step.");
+      setStatusType("error");
       return;
     }
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const file = formData.get('image') as File;
+    const file = formData.get("image") as File;
 
     setLoading(true);
     const result = await postRecipeAction({
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      difficulty: formData.get('difficulty') as DifficultyEnum,
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      difficulty: difficulty,
       categories: categories,
       ingredients: ingredients,
       steps: steps,
-      cookingTime: formData.get('cookingTime') as string,
-      servings: Number(formData.get('servings')),
+      cookingTime: formData.get("cookingTime") as string,
+      servings: Number(formData.get("servings")),
       authorId: user.id,
-      authorName: user.user_metadata?.full_name || user.email || 'Anonymous',
-      imageFile: file.size > 0 ? file : null,
+      authorName: user.user_metadata?.full_name || user.email || "Anonymous",
+      imageFile: file && file.size > 0 ? file : null,
     });
     setLoading(false);
 
     if (result.success) {
-      setStatus('Recipe posted successfully!');
+      setStatus("Recipe posted successfully! 🎉");
+      setStatusType("success");
       setImage(null);
       setImagePreview(null);
       setCategories([]);
       setIngredients([]);
       setSteps([]);
-      setCurrentIngredient('');
-      setCurrentStep('');
+      setCurrentIngredient("");
+      setCurrentStep("");
+      setDifficulty(DifficultyEnum.Easy);
       form.reset();
-      setTimeout(() => setStatus(null), 5000);
-      // router.push(`/recipes/${result.data.id}`); // Uncomment if you have recipe detail page
+      setTimeout(() => {
+        setStatus(null);
+        setStatusType(null);
+      }, 5000);
     } else {
-      setStatus(String(result.error) || 'Failed to submit recipe. Please try again later.');
+      setStatus(
+        String(result.error) ||
+          "Failed to submit recipe. Please try again later."
+      );
+      setStatusType("error");
+    }
+  };
+
+  const addIngredient = () => {
+    if (currentIngredient.trim()) {
+      setIngredients([...ingredients, currentIngredient.trim()]);
+      setCurrentIngredient("");
+    }
+  };
+
+  const removeIngredient = (index: number) => {
+    setIngredients(ingredients.filter((_, i) => i !== index));
+  };
+
+  const addStep = () => {
+    if (currentStep.trim()) {
+      setSteps([...steps, currentStep.trim()]);
+      setCurrentStep("");
+    }
+  };
+
+  const removeStep = (index: number) => {
+    setSteps(steps.filter((_, i) => i !== index));
+  };
+
+  const toggleCategory = (category: CategoryEnum) => {
+    if (categories.includes(category)) {
+      setCategories(categories.filter((c) => c !== category));
+    } else {
+      setCategories([...categories, category]);
     }
   };
 
   return (
-    <section className="w-full min-h-screen bg-stone-100 py-16">
-      <div className="max-w-3xl mx-auto px-6">
-        <h2 className="text-4xl font-bold text-black mb-6">Submit <span className="text-red-600">Your Recipe</span></h2>
+    <section className="w-full min-h-screen bg-background py-16">
+      <div className="max-w-4xl mx-auto px-6">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-4xl">
+              Submit <span className="text-primary">Your Recipe</span>
+            </CardTitle>
+            <CardDescription>
+              Share your culinary creation with the community. Fill out the form
+              below to submit your recipe.
+            </CardDescription>
+          </CardHeader>
 
-        {status && <div className="mb-4 text-green-600 font-semibold">{status}</div>}
+          <CardContent>
+            {status && (
+              <div
+                className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${
+                  statusType === "success"
+                    ? "bg-success/10 border border-success/20 text-success"
+                    : "bg-destructive/10 border border-destructive/20 text-destructive"
+                }`}
+              >
+                {statusType === "success" ? (
+                  <CheckCircle className="w-5 h-5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5" />
+                )}
+                <span className="font-semibold">{status}</span>
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-8 space-y-6">
-          <input
-            type="text"
-            placeholder="Recipe Title"
-            name="title"
-            className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-            required
-          />
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-foreground">
+                  Basic Information
+                </h3>
+                <Separator />
 
-          <input
-            type="file"
-            name="image"
-            className="w-full border border-gray-300 p-3 rounded"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file && file.size > 8 * 1024 * 1024) {
-                setStatus('Image size must be less than 8MB.');
-                setImage(null);
-                setImagePreview(null);
-                e.target.value = '';
-                return;
-              }
-              setImage(file || null);
-              setStatus(null);
-            }}
-          />
+                <div className="space-y-2">
+                  <Label htmlFor="title">
+                    Recipe Title <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    type="text"
+                    placeholder="e.g., Classic Spaghetti Carbonara"
+                    required
+                  />
+                </div>
 
-          {imagePreview && (
-            <Image width={128} height={128} src={imagePreview} alt="Thumbnail Preview" className="w-32 h-32 rounded object-cover" />
-          )}
+                <div className="space-y-2">
+                  <Label htmlFor="description">
+                    Description <span className="text-destructive">*</span>
+                  </Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    rows={4}
+                    placeholder="Describe your recipe, what makes it special..."
+                    required
+                  />
+                </div>
 
-          <textarea rows={3} placeholder="Recipe Description" name="description" className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-600" required />
+                <div className="space-y-2 w-full [&>button]:w-full">
+                  <Label htmlFor="difficulty">
+                    Difficulty <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={difficulty}
+                    onValueChange={(value) =>
+                      setDifficulty(value as DifficultyEnum)
+                    }
+                  >
+                    <SelectTrigger id="difficulty">
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={DifficultyEnum.Easy}>Easy</SelectItem>
+                      <SelectItem value={DifficultyEnum.Medium}>
+                        Medium
+                      </SelectItem>
+                      <SelectItem value={DifficultyEnum.Hard}>Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          <select name="difficulty" className="w-full border border-gray-300 p-3 rounded" defaultValue={DifficultyEnum.Easy}>
-            <option value={DifficultyEnum.Easy}>Easy</option>
-            <option value={DifficultyEnum.Medium}>Medium</option>
-            <option value={DifficultyEnum.Hard}>Hard</option>
-          </select>
+                <div className="space-y-2">
+                  <Label htmlFor="cookingTime">
+                    Cooking Time <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="cookingTime"
+                    name="cookingTime"
+                    type="text"
+                    placeholder="e.g., 30 minutes"
+                    required
+                  />
+                </div>
 
-          {/* Categories */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Categories</label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {Object.values(CategoryEnum).map((category) => (
-                <label key={category} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={categories.includes(category)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setCategories([...categories, category]);
-                      } else {
-                        setCategories(categories.filter(c => c !== category));
+                <div className="space-y-2">
+                  <Label htmlFor="servings">
+                    Servings <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="servings"
+                    name="servings"
+                    type="number"
+                    min="1"
+                    placeholder="e.g., 4"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Image Upload */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-foreground">
+                  Recipe Image
+                </h3>
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label htmlFor="image">Upload Image (Max 8MB)</Label>
+                  <div className="flex items-center gap-4">
+                    <Input
+                      id="image"
+                      name="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && file.size > 8 * 1024 * 1024) {
+                          setStatus("Image size must be less than 8MB.");
+                          setStatusType("error");
+                          setImage(null);
+                          setImagePreview(null);
+                          e.target.value = "";
+                          return;
+                        }
+                        setImage(file || null);
+                        setStatus(null);
+                      }}
+                      className="flex-1"
+                    />
+                  </div>
+
+                  {imagePreview && (
+                    <div className="mt-4">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Preview:
+                      </p>
+                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-border">
+                        <Image
+                          src={imagePreview}
+                          alt="Recipe preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Categories */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-foreground">
+                  Categories <span className="text-destructive">*</span>
+                </h3>
+                <Separator />
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {Object.values(CategoryEnum).map((category) => (
+                    <div key={category} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={category}
+                        checked={categories.includes(category)}
+                        onCheckedChange={() => toggleCategory(category)}
+                      />
+                      <Label
+                        htmlFor={category}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {category}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                {categories.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {categories.map((category) => (
+                      <Badge
+                        key={category}
+                        variant="secondary"
+                        className="bg-accent"
+                      >
+                        {category}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Ingredients */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-foreground">
+                  Ingredients <span className="text-destructive">*</span>
+                </h3>
+                <Separator />
+
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={currentIngredient}
+                    onChange={(e) => setCurrentIngredient(e.target.value)}
+                    placeholder="e.g., 2 cups flour"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addIngredient();
                       }
                     }}
-                    className="mr-2"
+                    className="flex-1"
                   />
-                  {category}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Ingredients */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Ingredients</label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={currentIngredient}
-                onChange={(e) => setCurrentIngredient(e.target.value)}
-                placeholder="Add an ingredient"
-                className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (currentIngredient.trim()) {
-                      setIngredients([...ingredients, currentIngredient.trim()]);
-                      setCurrentIngredient('');
-                    }
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (currentIngredient.trim()) {
-                    setIngredients([...ingredients, currentIngredient.trim()]);
-                    setCurrentIngredient('');
-                  }
-                }}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-              >
-                Add
-              </button>
-            </div>
-            <ul className="list-disc list-inside space-y-1">
-              {ingredients.map((ingredient, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>{ingredient}</span>
-                  <button
+                  <Button
                     type="button"
-                    onClick={() => setIngredients(ingredients.filter((_, i) => i !== index))}
-                    className="text-red-600 hover:text-red-800 ml-2"
+                    onClick={addIngredient}
+                    className="bg-success hover:bg-success/90"
                   >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add
+                  </Button>
+                </div>
 
-          {/* Steps */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={currentStep}
-                onChange={(e) => setCurrentStep(e.target.value)}
-                placeholder="Add a step"
-                className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (currentStep.trim()) {
-                      setSteps([...steps, currentStep.trim()]);
-                      setCurrentStep('');
-                    }
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (currentStep.trim()) {
-                    setSteps([...steps, currentStep.trim()]);
-                    setCurrentStep('');
-                  }
-                }}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-              >
-                Add
-              </button>
-            </div>
-            <ol className="list-decimal list-inside space-y-1">
-              {steps.map((step, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>{step}</span>
-                  <button
+                {ingredients.length > 0 && (
+                  <ul className="space-y-2 mt-4">
+                    {ingredients.map((ingredient, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                      >
+                        <span className="text-sm">{ingredient}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeIngredient(index)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  {ingredients.length} ingredient
+                  {ingredients.length !== 1 ? "s" : ""} added
+                </p>
+              </div>
+
+              {/* Instructions */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-foreground">
+                  Instructions <span className="text-destructive">*</span>
+                </h3>
+                <Separator />
+
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={currentStep}
+                    onChange={(e) => setCurrentStep(e.target.value)}
+                    placeholder="e.g., Preheat oven to 350°F"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addStep();
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
                     type="button"
-                    onClick={() => setSteps(steps.filter((_, i) => i !== index))}
-                    className="text-red-600 hover:text-red-800 ml-2"
+                    onClick={addStep}
+                    className="bg-success hover:bg-success/90"
                   >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <input type="number" placeholder="Servings" name="servings" className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-600" required />
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add
+                  </Button>
+                </div>
 
-          <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-md font-semibold" disabled={loading}>
-            {loading ? 'Submitting...' : 'Submit Recipe'}
-          </button>
-        </form>
+                {steps.length > 0 && (
+                  <ol className="space-y-2 mt-4">
+                    {steps.map((step, index) => (
+                      <li
+                        key={index}
+                        className="flex items-start gap-3 p-3 bg-muted rounded-lg"
+                      >
+                        <span className="font-semibold text-primary min-w-6">
+                          {index + 1}.
+                        </span>
+                        <span className="text-sm flex-1">{step}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeStep(index)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  {steps.length} step{steps.length !== 1 ? "s" : ""} added
+                </p>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex gap-4 pt-4">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-primary hover:bg-primary-hover"
+                  size="lg"
+                >
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {loading ? "Submitting Recipe..." : "Submit Recipe"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );
