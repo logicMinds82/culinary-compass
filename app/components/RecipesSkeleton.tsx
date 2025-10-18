@@ -6,9 +6,9 @@ export default function RecipesSkeleton() {
     <section className="py-12 bg-background">
       <div className="container mx-auto px-4">
         {/* Title Skeleton */}
-        <div className="text-center mb-8">
-          <Skeleton height={48} width={300} className="mx-auto" />
-        </div>
+        <h2 className="text-4xl font-bold text-foreground text-center mb-8">
+          Recipe <span className="text-primary">Explorer</span>
+        </h2>
 
         {/* Search Bar & Filters Skeleton */}
         <div className="mb-8 flex items-center gap-4 flex-wrap">
