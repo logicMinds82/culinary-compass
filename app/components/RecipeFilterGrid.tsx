@@ -44,6 +44,10 @@ export default function AdvancedRecipeGrid({ recipes }: RecipeFilterGridProps) {
   const recipesPerPage = 9;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const initialFavs = getFavoriteRecipes();
     setFavorites(initialFavs);
   }, [recipes?.length]);
