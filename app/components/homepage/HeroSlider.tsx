@@ -10,6 +10,7 @@ import "swiper/css/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Make sure these images exist in "/public/images/slide1.jpg", etc.
 const slides = [
@@ -84,7 +85,7 @@ const HeroSlider = () => {
                     <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, delay: 0.4 }}
+                    transition={{ duration: 1, delay: 0.2 }}
                     className="text-lg md:text-xl mb-6"
                     >
                     {slide.description}
@@ -94,12 +95,15 @@ const HeroSlider = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.6 }}
                     >
-                    <Link
-                        href={slide.buttonURL}
-                        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full text-lg font-semibold transition transform hover:scale-105"
+                    <Button
+                        asChild
+                        size="lg"
+                        className="bg-primary hover:bg-primary-hover text-lg font-semibold rounded-full transform hover:scale-105 transition-transform"
                     >
-                        {slide.buttonText}
-                    </Link>
+                        <Link href={slide.buttonURL}>
+                            {slide.buttonText}
+                        </Link>
+                    </Button>
                     </motion.div>
                 </motion.div>
               </div>
@@ -108,20 +112,26 @@ const HeroSlider = () => {
         ))}
       </Swiper>
 
-      {/* Custom Arrows (Red background) */}
-      <button className="swiper-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-red-600 p-3 rounded-full text-white hover:bg-red-700 transition">
+      {/* Custom Arrows */}
+      <Button
+        size="icon"
+        className="swiper-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-primary-hover rounded-full h-12 w-12"
+      >
         <ChevronLeft size={30} />
-      </button>
-      <button className="swiper-next absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-red-600 p-3 rounded-full text-white hover:bg-red-700 transition">
+      </Button>
+      <Button
+        size="icon"
+        className="swiper-next absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-primary-hover rounded-full h-12 w-12"
+      >
         <ChevronRight size={30} />
-      </button>
+      </Button>
 
       {/* Pagination with custom bullet colors */}
       <div
         className="swiper-pagination absolute bottom-4 flex justify-center space-x-2 z-10"
         style={
           {
-            "--swiper-pagination-color": "#dc2626", // Active bullet color (Tailwind red-600)
+            "--swiper-pagination-color": "oklch(0.668 0.183 25.66)", // Primary color
             "--swiper-pagination-bullet-inactive-color": "#ffffff",
             "--swiper-pagination-bullet-inactive-opacity": "0.6",
           } as React.CSSProperties

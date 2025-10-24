@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Card } from "@/components/ui/card";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -16,12 +17,12 @@ const partners = [
 
 const SocialProof = () => {
   return (
-    <section className="py-16 bg-white text-center">
-      <div className="w-full max-w-5xl px-6 mx-auto">
+  <section className="py-16 bg-background text-center">
+  <div className="w-full max-w-5xl px-6 mx-auto">
         {/* Section Title */}
-        <h2 className="text-4xl font-bold text-black mb-8">
+        <h2 className="text-4xl font-bold text-foreground mb-8">
           Featured In{" "}
-          <span className="text-red-600">Top Publications</span>
+          <span className="text-primary">Top Publications</span>
         </h2>
 
         {/* Swiper Slider */}
@@ -42,7 +43,7 @@ const SocialProof = () => {
               key={index}
               className="flex items-center justify-center h-24"
             >
-              <div className="relative w-auto h-full flex items-center">
+              <Card className="relative w-auto h-full flex items-center justify-center p-2 bg-background border-none shadow-none">
                 <Image
                   src={partner.logo}
                   alt={partner.name}
@@ -51,7 +52,7 @@ const SocialProof = () => {
                   className="max-h-full max-w-full object-contain grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300"
                   priority={false}
                 />
-              </div>
+              </Card>
             </SwiperSlide>
           ))}
         </Swiper>
