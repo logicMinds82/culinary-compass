@@ -4,14 +4,14 @@ import { createClient } from "@/app/utils/supabase/server";
 // GET - Fetch a single recipe for editing
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
-    
+
     // Get the authenticated user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
+
     if (userError || !user) {
       return NextResponse.json(
         { message: "Unauthorized" },
@@ -19,7 +19,7 @@ export async function GET(
       );
     }
 
-    const recipeId = params.id;
+    const recipeId = await params;
 
     // Fetch the recipe
     const { data: recipe, error } = await supabase
