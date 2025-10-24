@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import {
   getFavoriteRecipes,
   addFavoriteRecipe,
@@ -107,7 +107,7 @@ export default function AdvancedRecipeGrid({ recipes }: RecipeFilterGridProps) {
           <div className="flex items-center gap-4 [&>button]:w-full flex-1">
             <Select
               value={filterDifficulty}
-              onValueChange={(value) => {
+              onValueChange={(value: SetStateAction<string>) => {
                 setFilterDifficulty(value);
                 setCurrentPage(1);
               }}
@@ -124,7 +124,7 @@ export default function AdvancedRecipeGrid({ recipes }: RecipeFilterGridProps) {
             </Select>
             <Select
               value={filterCategory}
-              onValueChange={(value) => {
+              onValueChange={(value: SetStateAction<string>) => {
                 setFilterCategory(value);
                 setCurrentPage(1);
               }}
