@@ -5,7 +5,6 @@ import FeaturedRecipesGrid from "./components/homepage/FeaturedRecipesGrid";
 import FeaturesSection from "./components/homepage/FeaturesSection";
 import CTASection from "./components/homepage/CTASection";
 import FAQSection from "./components/homepage/FAQSection";
-import InstagramGallery from "./components/homepage/InstagramGallery";
 
 export default function Home() {
   return (
@@ -15,7 +14,6 @@ export default function Home() {
       <FeaturesSection />
       <CTASection />
       <FAQSection />
-      <InstagramGallery />
     </main>
   );
 }

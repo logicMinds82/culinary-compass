@@ -465,9 +465,9 @@ export default function SubmitRecipeForm({ initialRecipe }: SubmitRecipeFormProp
                   <Button
                     type="button"
                     onClick={addIngredient}
-                    className="bg-success hover:bg-success/90"
+                    className="gap-0 cursor-pointer"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4" />
                     Add
                   </Button>
                 </div>
@@ -485,7 +485,7 @@ export default function SubmitRecipeForm({ initialRecipe }: SubmitRecipeFormProp
                           variant="ghost"
                           size="sm"
                           onClick={() => removeIngredient(index)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -523,9 +523,9 @@ export default function SubmitRecipeForm({ initialRecipe }: SubmitRecipeFormProp
                   <Button
                     type="button"
                     onClick={addStep}
-                    className="bg-success hover:bg-success/90"
+                    className="gap-0 cursor-pointer"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4" />
                     Add
                   </Button>
                 </div>
@@ -535,7 +535,7 @@ export default function SubmitRecipeForm({ initialRecipe }: SubmitRecipeFormProp
                     {steps.map((step, index) => (
                       <li
                         key={index}
-                        className="flex items-start gap-3 p-3 bg-muted rounded-lg"
+                        className="flex items-center gap-3 p-3 bg-muted rounded-lg"
                       >
                         <span className="font-semibold text-primary min-w-6">
                           {index + 1}.
@@ -546,7 +546,7 @@ export default function SubmitRecipeForm({ initialRecipe }: SubmitRecipeFormProp
                           variant="ghost"
                           size="sm"
                           onClick={() => removeStep(index)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                         >
                           <X className="w-4 h-4" />
                         </Button>

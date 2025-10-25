@@ -46,7 +46,7 @@ const FeaturesSection = () => {
       </motion.div>
 
       {/* Features Grid */}
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="mt-12 flex lg:flex-row flex-col gap-8 max-w-6xl mx-auto">
         {features.map((feature, index) => (
           <motion.div
             key={index}
@@ -54,13 +54,14 @@ const FeaturesSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 * index, duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
+            className="flex-1"
           >
             <Card className="p-6 flex flex-col items-center text-center transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
               <div className="mb-4">{feature.icon}</div>
               <h3 className="text-2xl font-semibold mb-2 text-foreground">
                 {feature.title}
               </h3>
-              <p className="text-muted-foreground line-clamp-2">{feature.description}</p>
+              <p className="text-muted-foreground line-clamp-3">{feature.description}</p>
             </Card>
           </motion.div>
         ))}

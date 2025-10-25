@@ -191,7 +191,7 @@ export default function LoginPage() {
           <div className="flex border-b mb-6">
             <Button
               variant="ghost"
-              className={`flex-1 rounded-none border-b-2 hover:bg-transparent ${
+              className={`flex-1 rounded-none border-b-2 hover:bg-transparent cursor-pointer ${
                 activeTab === "login"
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground"
@@ -202,7 +202,7 @@ export default function LoginPage() {
             </Button>
             <Button
               variant="ghost"
-              className={`flex-1 rounded-none border-b-2 hover:bg-transparent ${
+              className={`flex-1 rounded-none border-b-2 hover:bg-transparent cursor-pointer ${
                 activeTab === "signup"
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground"

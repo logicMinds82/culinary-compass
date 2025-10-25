@@ -13,7 +13,7 @@ A community-driven recipe sharing platform built with Next.js. Share your favori
 
 ## Tech Stack
 
-- **Framework**: Next.js 14+ (App Router)
+- **Framework**: Next.js 15+ (App Router)
 - **Authentication**: Supabase Auth
 - **Database**: Supabase (PostgreSQL)
 - **Styling**: Tailwind CSS
