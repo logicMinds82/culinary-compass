@@ -34,18 +34,17 @@ const Footer = () => {
           <h3 className="text-xl font-semibold mb-4 text-primary">Quick Links</h3>
           <ul className="space-y-2">
             <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
-            <li><Link href="/" className="hover:text-primary transition-colors">Features</Link></li>
-            <li><Link href="/" className="hover:text-primary transition-colors">Pricing</Link></li>
-            <li><Link href="/" className="hover:text-primary transition-colors">Contact</Link></li>
+            <li><Link href="/recipes" className="hover:text-primary transition-colors">Recipes</Link></li>
+            <li><Link href="/submit-recipe" className="hover:text-primary transition-colors">Submit Recipe</Link></li>
+            <li><Link href="/contactus" className="hover:text-primary transition-colors">Contact</Link></li>
           </ul>
         </div>
 
         {/* Contact Info */}
         <div>
           <h3 className="text-xl font-semibold mb-4 text-primary">Contact Us</h3>
-          <p>Email: <a href="mailto:info@example.com" className="hover:text-primary transition-colors">info@example.com</a></p>
-          <p>Phone: <a href="tel:+1234567890" className="hover:text-primary transition-colors">+1 234 567 890</a></p>
-          <p>Address: 123 Main Street, Tish City</p>
+          <p>Email: <a href="mailto:contact@culinarycompass.com" className="hover:text-primary transition-colors">contact@culinarycompass.com</a></p>
+          <p className="mt-2">Join our community and start sharing recipes today!</p>
         </div>
 
         {/* Social Media */}
@@ -63,7 +62,7 @@ const Footer = () => {
       <Separator className="my-8 max-w-6xl mx-auto bg-muted" />
       
       <div className="text-center text-muted-foreground text-sm">
-        &copy; {new Date().getFullYear()} Tishonator. All rights reserved.
+        &copy; {new Date().getFullYear()} Culinary Compass - A Community Recipe Sharing Platform. All rights reserved.
       </div>
       
       {/* Scroll to Top Button */}
@@ -71,7 +70,7 @@ const Footer = () => {
         <Button
           onClick={scrollToTop}
           size="icon"
-          className="fixed bottom-8 right-8 rounded-full shadow-lg bg-primary hover:bg-primary-hover"
+          className="fixed bottom-8 right-8 rounded-full shadow-lg bg-primary hover:bg-primary-hover cursor-pointer"
         >
           <ArrowUp className="text-primary-foreground" size={24} />
         </Button>

@@ -14,12 +14,12 @@ const CTASection = () => {
       >
         {/* CTA Headline */}
         <h2 className="text-4xl md:text-5xl font-bold mb-4">
-          Start Your <span className="text-primary">Cooking Journey</span> Today!
+          Join Our <span className="text-primary">Recipe Community</span> Today!
         </h2>
 
         {/* CTA Subtext */}
         <p className="text-lg text-muted-foreground mb-6">
-          Join thousands of users discovering new recipes and saving time with Culinary Compass.
+          Share your recipes, discover new dishes, and connect with fellow food enthusiasts.
         </p>
 
         {/* CTA Button */}
@@ -33,8 +33,8 @@ const CTASection = () => {
             size="lg"
             className="bg-primary hover:bg-primary-hover text-lg font-semibold transform hover:scale-105 shadow-md"
           >
-            <Link href="/">
-              Get Started Now
+            <Link href="/submit-recipe">
+              Submit Your Recipe
             </Link>
           </Button>
         </motion.div>
