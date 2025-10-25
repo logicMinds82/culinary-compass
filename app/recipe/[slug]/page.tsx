@@ -61,7 +61,7 @@ export default function SingleRecipePage() {
   }
 
   return (
-    <main className="container mx-auto px-4 py-12">
+    <section className="container mx-auto px-4 py-12">
       <Card className="max-w-5xl mx-auto overflow-hidden">
         <div className="relative h-[400px]">
           <Image src={recipe.image} alt={recipe.title} fill style={{ objectFit: "cover" }} />
@@ -124,6 +124,6 @@ export default function SingleRecipePage() {
           ))}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

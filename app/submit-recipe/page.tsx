@@ -1,13 +1,11 @@
 import { Suspense } from "react";
 import SubmitRecipeClientWrapper from "./SubmitRecipeClientWrapper";
-import RecipesSkeleton from "../components/RecipesSkeleton";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function SubmitRecipePage() {
   return (
-    <main>
-      <Suspense fallback={<RecipesSkeleton />}>
-        <SubmitRecipeClientWrapper />
-      </Suspense>
-    </main>
+    <Suspense fallback={<LoadingSpinner />}>
+      <SubmitRecipeClientWrapper />
+    </Suspense>
   );
 }
