@@ -1,28 +1,28 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Dumbbell, BarChart, CalendarCheck } from "lucide-react";
+import { BookOpen, Heart, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 
 const features = [
   {
-  icon: <Dumbbell size={40} className="text-primary" />,
-    title: "Recipe Logging",
+  icon: <BookOpen size={40} className="text-primary" />,
+    title: "Share & Discover",
     description:
-      "Easily save, categorize, and recall all your recipes in one place.",
+      "Browse thousands of community-submitted recipes and share your own culinary creations with food lovers worldwide.",
   },
   {
-  icon: <BarChart size={40} className="text-primary" />,
-    title: "Progress Insights",
+  icon: <Heart size={40} className="text-primary" />,
+    title: "Save Favorites",
     description:
-      "Analyze your cooking journey with detailed stats and recipe usage reports.",
+      "Build your personal collection by saving recipes you love and access them anytime, anywhere.",
   },
   {
-  icon: <CalendarCheck size={40} className="text-primary" />,
-    title: "Meal Planning",
+  icon: <Users size={40} className="text-primary" />,
+    title: "Community Driven",
     description:
-      "Set personalized meal plans and stay organized with grocery lists and scheduling.",
+      "Connect with fellow home cooks, discover new cuisines, and be part of a growing food community.",
   },
 ];
 
@@ -41,13 +41,12 @@ const FeaturesSection = () => {
           Why Choose <span className="text-primary">Culinary Compass?</span>
         </h2>
         <p className="text-lg text-muted-foreground">
-          Unlock the full potential of your culinary journey with our intuitive
-          features designed for real results.
+          Join a vibrant community of food enthusiasts sharing and discovering recipes from around the world.
         </p>
       </motion.div>
 
       {/* Features Grid */}
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="mt-12 flex lg:flex-row flex-col gap-8 max-w-6xl mx-auto">
         {features.map((feature, index) => (
           <motion.div
             key={index}
@@ -55,13 +54,14 @@ const FeaturesSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 * index, duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
+            className="flex-1"
           >
             <Card className="p-6 flex flex-col items-center text-center transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
               <div className="mb-4">{feature.icon}</div>
               <h3 className="text-2xl font-semibold mb-2 text-foreground">
                 {feature.title}
               </h3>
-              <p className="text-muted-foreground line-clamp-2">{feature.description}</p>
+              <p className="text-muted-foreground line-clamp-3">{feature.description}</p>
             </Card>
           </motion.div>
         ))}

@@ -1,11 +1,17 @@
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { createClient } from "../utils/supabase/server";
 import SubmitRecipeClientWrapper from "./SubmitRecipeClientWrapper";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export default function SubmitRecipePage() {
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <SubmitRecipeClientWrapper />
-    </Suspense>
-  );
+export default async function SubmitRecipePage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  
+  if (!currentUser) {
+    redirect("/login");
+  }
+
+  return <SubmitRecipeClientWrapper />;
 }

@@ -1,23 +1,46 @@
 import RecipeFilterGrid from "../components/RecipeFilterGrid";
-import { createClient } from "../utils/supabase/server";
+import { getFilteredRecipes } from "../services/recipeService";
 
 export const dynamic = "force-dynamic";
 
-export default async function RecipesPage() {
+interface RecipesPageProps {
+  searchParams: Promise<{
+    search?: string;
+    difficulty?: string;
+    category?: string;
+    page?: string;
+  }>;
+}
 
-  const supabase = await createClient();
-  const { data: recipes, error } = await supabase
-    .from("recipes")
-    .select("*")
-    .order("id");
+export default async function RecipesPage({ searchParams }: RecipesPageProps) {
+  const params = await searchParams;
+  const search = params.search || "";
+  const difficulty = params.difficulty || "";
+  const category = params.category || "";
+  const page = parseInt(params.page || "1");
+  const recipesPerPage = 9;
 
-  if (error) {
-    console.error("Error fetching recipes:", error);
-  }
+  // Create the promise and pass it directly without awaiting
+  const recipesPromise = getFilteredRecipes({
+    search,
+    difficulty,
+    category,
+    page,
+    limit: recipesPerPage,
+  });
 
   return (
     <main>
-      <RecipeFilterGrid recipes={recipes || []} />
+      <RecipeFilterGrid
+        recipesPromise={recipesPromise}
+        currentPage={page}
+        recipesPerPage={recipesPerPage}
+        currentFilters={{
+          search,
+          difficulty,
+          category,
+        }}
+      />
     </main>
   );
 }

@@ -5,19 +5,19 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 const faqs = [
   {
     question: "How does Culinary Compass help me organize my recipes?",
-    answer: "Our platform allows you to store, categorize, and filter recipes quickly. Plus, you can add notes, ratings, and share them with your community.",
+    answer: "Our platform allows you to store, categorize, and filter recipes quickly. You can add your own recipes, browse community submissions, and save your favorites.",
   },
   {
-    question: "Is there a free plan?",
-    answer: "Yes! We offer a free plan with essential features. You can also upgrade anytime for more advanced analytics, meal planning, and custom recipe collections.",
+    question: "Is Culinary Compass free to use?",
+    answer: "Yes! Culinary Compass is a free community platform where anyone can share and discover recipes. Simply create an account to start contributing.",
   },
   {
-    question: "Does the app integrate with grocery lists or meal planners?",
-    answer: "Absolutely! Culinary Compass can generate grocery lists from selected recipes, and it supports basic meal planning.",
+    question: "Can I submit my own recipes?",
+    answer: "Absolutely! Once you create an account, you can submit your own recipes to share with the community. You can also edit and manage your submitted recipes.",
   },
   {
-    question: "Can I share recipes with friends?",
-    answer: "Yes, you can easily share your favorite recipes or entire collections on social media or directly with other Culinary Compass users.",
+    question: "How do I save my favorite recipes?",
+    answer: "Simply click the heart icon on any recipe to add it to your favorites. You can access all your saved recipes from the 'Favorite Recipes' page.",
   },
 ];
 

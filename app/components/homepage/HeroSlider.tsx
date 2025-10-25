@@ -16,26 +16,26 @@ import { Button } from "@/components/ui/button";
 const slides = [
   {
     id: 1,
-    title: "Discover the Best Recipes",
-    description: "Explore thousands of delicious recipes tailored to your taste.",
-    buttonText: "Explore Now",
-    buttonURL: "/#",
+    title: "Share Your Favorite Recipes",
+    description: "Join our community and discover thousands of delicious recipes from home cooks around the world.",
+    buttonText: "Explore Recipes",
+    buttonURL: "/recipes",
     image: "/images/slide1.jpg",
   },
   {
     id: 2,
-    title: "Cook with Confidence",
-    description: "Step-by-step instructions and tips to master any dish.",
-    buttonText: "Get Started",
-    buttonURL: "/#",
+    title: "Discover New Flavors",
+    description: "Browse community-submitted recipes and find your next culinary adventure.",
+    buttonText: "Browse Recipes",
+    buttonURL: "/recipes",
     image: "/images/slide2.jpg",
   },
   {
     id: 3,
-    title: "Share Your Creations",
-    description: "Join our community and showcase your best recipes.",
-    buttonText: "Join Us",
-    buttonURL: "/#",
+    title: "Contribute to the Community",
+    description: "Share your own recipes and inspire others with your culinary creations.",
+    buttonText: "Submit Recipe",
+    buttonURL: "/submit-recipe",
     image: "/images/slide3.jpg",
   },
 ];
@@ -93,7 +93,7 @@ const HeroSlider = () => {
                     <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 1 }}
+                    transition={{ duration: 0.3, delay: 1 }}
                     >
                     <Button
                         asChild

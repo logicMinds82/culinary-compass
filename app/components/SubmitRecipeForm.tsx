@@ -7,6 +7,7 @@ import { updateRecipeAction } from "../actions/updateRecipeAction";
 import { useAuth } from "./AuthProvider";
 import { DifficultyEnum } from "../types/DifficultyEnum";
 import { CategoryEnum } from "../types/CategoryEnum";
+import type { Recipe } from "../services/recipeService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,12 +32,12 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, Plus, X, CheckCircle, AlertCircle } from "lucide-react";
 
 interface SubmitRecipeFormProps {
-  recipeId?: number;
+  initialRecipe?: Recipe | null;
 }
 
-export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
+export default function SubmitRecipeForm({ initialRecipe }: SubmitRecipeFormProps) {
   const { user } = useAuth();
-  const isEditMode = !!recipeId;
+  const isEditMode = !!initialRecipe;
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -50,7 +51,6 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
     null
   );
   const [loading, setLoading] = useState(false);
-  const [loadingRecipe, setLoadingRecipe] = useState(false);
   const [difficulty, setDifficulty] = useState<DifficultyEnum>(
     DifficultyEnum.Easy
   );
@@ -62,41 +62,19 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
 
   // Load recipe data if in edit mode
   useEffect(() => {
-    if (recipeId && user) {
-      loadRecipeData(recipeId);
+    if (initialRecipe) {
+      setTitle(initialRecipe.title || "");
+      setDescription(initialRecipe.description || "");
+      setDifficulty(initialRecipe.difficulty as DifficultyEnum || DifficultyEnum.Easy);
+      setCategories(initialRecipe.categories as CategoryEnum[] || []);
+      setIngredients(initialRecipe.ingredients || []);
+      setSteps(initialRecipe.steps || []);
+      setCookingTime(initialRecipe.cookingTime || "");
+      setServings(initialRecipe.servings || 4);
+      setExistingImageUrl(initialRecipe.image || null);
+      setImagePreview(initialRecipe.image || null);
     }
-  }, [recipeId, user]);
-
-  const loadRecipeData = async (id: number) => {
-    try {
-      setLoadingRecipe(true);
-      const response = await fetch(`/api/recipe/${id}`);
-      
-      if (!response.ok) {
-        throw new Error("Failed to load recipe");
-      }
-
-      const recipe = await response.json();
-      
-      // Populate form with recipe data
-      setTitle(recipe.title || "");
-      setDescription(recipe.description || "");
-      setDifficulty(recipe.difficulty || DifficultyEnum.Easy);
-      setCategories(recipe.categories || []);
-      setIngredients(recipe.ingredients || []);
-      setSteps(recipe.steps || []);
-      setCookingTime(recipe.cookingTime || "");
-      setServings(recipe.servings || 4);
-      setExistingImageUrl(recipe.image || null);
-      setImagePreview(recipe.image || null);
-    } catch (error) {
-      console.error("Error loading recipe:", error);
-      setStatus("Failed to load recipe data");
-      setStatusType("error");
-    } finally {
-      setLoadingRecipe(false);
-    }
-  };
+  }, [initialRecipe]);
 
   useEffect(() => {
     if (image) {
@@ -139,10 +117,10 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
     try {
       let result;
 
-      if (isEditMode && recipeId) {
+      if (isEditMode && initialRecipe) {
         // Update existing recipe
         result = await updateRecipeAction({
-          id: recipeId,
+          id: initialRecipe.id,
           title,
           description,
           difficulty,
@@ -263,28 +241,23 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
           </CardHeader>
 
           <CardContent>
-            {loadingRecipe ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <>
-                {status && (
-                  <div
-                    className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${
-                      statusType === "success"
-                        ? "bg-success/10 border border-success/20 text-success"
-                        : "bg-destructive/10 border border-destructive/20 text-destructive"
-                    }`}
-                  >
-                    {statusType === "success" ? (
-                      <CheckCircle className="w-5 h-5" />
-                    ) : (
-                      <AlertCircle className="w-5 h-5" />
-                    )}
-                    <span className="font-semibold">{status}</span>
-                  </div>
-                )}
+            <>
+              {status && (
+                <div
+                  className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${
+                    statusType === "success"
+                      ? "bg-success/10 border border-success/20 text-success"
+                      : "bg-destructive/10 border border-destructive/20 text-destructive"
+                  }`}
+                >
+                  {statusType === "success" ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5" />
+                  )}
+                  <span className="font-semibold">{status}</span>
+                </div>
+              )}
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                   {/* Basic Information */}
@@ -492,9 +465,9 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                   <Button
                     type="button"
                     onClick={addIngredient}
-                    className="bg-success hover:bg-success/90"
+                    className="gap-0 cursor-pointer"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4" />
                     Add
                   </Button>
                 </div>
@@ -512,7 +485,7 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                           variant="ghost"
                           size="sm"
                           onClick={() => removeIngredient(index)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -550,9 +523,9 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                   <Button
                     type="button"
                     onClick={addStep}
-                    className="bg-success hover:bg-success/90"
+                    className="gap-0 cursor-pointer"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4" />
                     Add
                   </Button>
                 </div>
@@ -562,7 +535,7 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                     {steps.map((step, index) => (
                       <li
                         key={index}
-                        className="flex items-start gap-3 p-3 bg-muted rounded-lg"
+                        className="flex items-center gap-3 p-3 bg-muted rounded-lg"
                       >
                         <span className="font-semibold text-primary min-w-6">
                           {index + 1}.
@@ -573,7 +546,7 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                           variant="ghost"
                           size="sm"
                           onClick={() => removeStep(index)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -591,7 +564,7 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-primary hover:bg-primary-hover"
+                  className="flex-1 bg-primary hover:bg-primary-hover cursor-pointer"
                   size="lg"
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -605,11 +578,10 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                 </Button>
               </div>
             </form>
-          </>
-        )}
-      </CardContent>
-    </Card>
-  </div>
-</section>
-);
+            </>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
 }

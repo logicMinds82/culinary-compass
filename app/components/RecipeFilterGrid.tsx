@@ -1,12 +1,7 @@
 "use client";
 
-import { useState, useEffect, SetStateAction } from "react";
-import {
-  getFavoriteRecipes,
-  addFavoriteRecipe,
-  removeFavoriteRecipe,
-} from "@/app/api/favoritesAPI";
-import { Button } from "@/components/ui/button";
+import { Suspense, useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,7 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import RecipeCard from "./RecipeCard";
+import RecipesGrid from "./RecipesGrid";
+import RecipesPagination from "./RecipesPagination";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface Recipe {
   id: number;
@@ -25,64 +22,117 @@ interface Recipe {
   description: string;
   difficulty: string;
   cookingTime: string;
+  servings: number;
   categories: string[];
-  ingredients: string[];
   ratings: number;
   reviews: number;
 }
 
 interface RecipeFilterGridProps {
-  recipes?: Recipe[];
+  recipesPromise: Promise<{
+    recipes: Recipe[];
+    total: number;
+  }>;
+  currentPage: number;
+  recipesPerPage: number;
+  currentFilters: {
+    search: string;
+    difficulty: string;
+    category: string;
+  };
 }
 
-export default function AdvancedRecipeGrid({ recipes }: RecipeFilterGridProps) {
-  const [favorites, setFavorites] = useState<number[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterDifficulty, setFilterDifficulty] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const recipesPerPage = 9;
+export default function RecipeFilterGrid({
+  recipesPromise,
+  currentPage,
+  recipesPerPage,
+  currentFilters,
+}: RecipeFilterGridProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(currentFilters.search);
+  const [filterDifficulty, setFilterDifficulty] = useState(currentFilters.difficulty || "all");
+  const [filterCategory, setFilterCategory] = useState(currentFilters.category || "all");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Cleanup debounce timer on unmount
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const timer = debounceTimerRef.current;
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
   }, []);
 
-  useEffect(() => {
-    const initialFavs = getFavoriteRecipes();
-    setFavorites(initialFavs);
-  }, [recipes?.length]);
-
-  const toggleFavorite = (recipeId: number) => {
-    if (favorites.includes(recipeId)) {
-      const updated = removeFavoriteRecipe(recipeId);
-      setFavorites(updated);
-    } else {
-      const updated = addFavoriteRecipe(recipeId);
-      setFavorites(updated);
+  const updateURL = (params: { search?: string; difficulty?: string; category?: string; page?: number }) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    
+    if (params.search !== undefined) {
+      if (params.search) {
+        newParams.set("search", params.search);
+      } else {
+        newParams.delete("search");
+      }
     }
+    
+    if (params.difficulty !== undefined) {
+      if (params.difficulty && params.difficulty !== "all") {
+        newParams.set("difficulty", params.difficulty);
+      } else {
+        newParams.delete("difficulty");
+      }
+    }
+    
+    if (params.category !== undefined) {
+      if (params.category && params.category !== "all") {
+        newParams.set("category", params.category);
+      } else {
+        newParams.delete("category");
+      }
+    }
+    
+    if (params.page !== undefined) {
+      if (params.page > 1) {
+        newParams.set("page", params.page.toString());
+      } else {
+        newParams.delete("page");
+      }
+    }
+    
+    router.push(`/recipes?${newParams.toString()}`);
   };
 
-  const filteredRecipes = recipes?.filter((recipe) => {
-    const matchesSearch =
-      recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      recipe.ingredients.some((ingredient) =>
-        ingredient.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    // Set new timer for debounced search
+    debounceTimerRef.current = setTimeout(() => {
+      updateURL({ search: value, page: 1 });
+    }, 500);
+  };
 
-    const matchesDifficulty =
-      filterDifficulty === "" || filterDifficulty === "all" || recipe.difficulty === filterDifficulty;
+  const handleDifficultyChange = (value: string) => {
+    setFilterDifficulty(value);
+    updateURL({ difficulty: value, page: 1 });
+  };
 
-    const matchesCategory =
-      filterCategory === "" || filterCategory === "all" || recipe.categories.includes(filterCategory);
+  const handleCategoryChange = (value: string) => {
+    setFilterCategory(value);
+    updateURL({ category: value, page: 1 });
+  };
 
-    return matchesSearch && matchesDifficulty && matchesCategory;
-  });
+  const handlePageChange = (page: number) => {
+    updateURL({ page });
+  };
 
-  const totalPages = Math.ceil((filteredRecipes?.length || 0) / recipesPerPage);
-  const displayedRecipes = filteredRecipes?.slice(
-    (currentPage - 1) * recipesPerPage,
-    currentPage * recipesPerPage
-  );
+  // Create a unique key based on current filters for Suspense boundary
+  const suspenseKey = `${currentFilters.search}-${currentFilters.difficulty}-${currentFilters.category}-${currentPage}`;
 
   return (
     <section className="py-12 bg-background">
@@ -98,19 +148,13 @@ export default function AdvancedRecipeGrid({ recipes }: RecipeFilterGridProps) {
             placeholder="Search recipes..."
             className="col-span-2 flex-1 min-w-[180px]"
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
+            onChange={(e) => handleSearch(e.target.value)}
           />
 
           <div className="flex items-center gap-4 [&>button]:w-full flex-1">
             <Select
               value={filterDifficulty}
-              onValueChange={(value: SetStateAction<string>) => {
-                setFilterDifficulty(value);
-                setCurrentPage(1);
-              }}
+              onValueChange={handleDifficultyChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="All Difficulties" />
@@ -124,10 +168,7 @@ export default function AdvancedRecipeGrid({ recipes }: RecipeFilterGridProps) {
             </Select>
             <Select
               value={filterCategory}
-              onValueChange={(value: SetStateAction<string>) => {
-                setFilterCategory(value);
-                setCurrentPage(1);
-              }}
+              onValueChange={handleCategoryChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="All Categories" />
@@ -145,49 +186,20 @@ export default function AdvancedRecipeGrid({ recipes }: RecipeFilterGridProps) {
           </div>
         </div>
 
-        {/* Recipes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {(displayedRecipes?.length || 0) > 0 ? (
-            displayedRecipes?.map((recipe) => {
-              const isFavorite = favorites.includes(recipe.id);
+        {/* Recipes Grid with Suspense */}
+        <Suspense key={`recipes-${suspenseKey}`} fallback={<LoadingSpinner />}>
+          <RecipesGrid recipesPromise={recipesPromise} />
+        </Suspense>
 
-              return (
-                <RecipeCard
-                  key={recipe.id}
-                  id={recipe.id}
-                  slug={recipe.slug}
-                  title={recipe.title}
-                  image={recipe.image}
-                  description={recipe.description}
-                  cookingTime={recipe.cookingTime}
-                  ratings={recipe.ratings}
-                  reviews={recipe.reviews}
-                  categories={recipe.categories}
-                  isFavorite={isFavorite}
-                  onToggleFavorite={toggleFavorite}
-                />
-              );
-            })
-          ) : (
-            <p className="text-center text-muted-foreground col-span-3">
-              No recipes found...
-            </p>
-          )}
-        </div>
-
-        {/* Pagination */}
-        <div className="mt-8 flex justify-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <Button
-              key={i}
-              variant={currentPage === i + 1 ? "default" : "outline"}
-              onClick={() => setCurrentPage(i + 1)}
-              className={currentPage === i + 1 ? "bg-primary hover:bg-primary-hover" : ""}
-            >
-              {i + 1}
-            </Button>
-          ))}
-        </div>
+        {/* Pagination with Suspense */}
+        <Suspense key={`pagination-${suspenseKey}`} fallback={null}>
+          <RecipesPagination
+            recipesPromise={recipesPromise}
+            currentPage={currentPage}
+            recipesPerPage={recipesPerPage}
+            onPageChange={handlePageChange}
+          />
+        </Suspense>
       </div>
     </section>
   );
