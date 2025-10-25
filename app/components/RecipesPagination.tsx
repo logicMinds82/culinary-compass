@@ -31,7 +31,7 @@ export default function RecipesPagination({
           key={i}
           variant={currentPage === i + 1 ? "default" : "outline"}
           onClick={() => onPageChange(i + 1)}
-          className={currentPage === i + 1 ? "bg-primary hover:bg-primary-hover" : ""}
+          className={currentPage === i + 1 ? "bg-primary hover:bg-primary-hover" : "cursor-pointer"}
         >
           {i + 1}
         </Button>
