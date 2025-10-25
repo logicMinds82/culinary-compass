@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 import HeroSlider from "./components/homepage/HeroSlider";
 import FeaturedRecipesGrid from "./components/homepage/FeaturedRecipesGrid";
 import FeaturesSection from "./components/homepage/FeaturesSection";

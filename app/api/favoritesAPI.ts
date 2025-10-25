@@ -28,17 +28,3 @@ export function removeFavoriteRecipe(recipeId: number): number[] {
   window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
   return favorites;
 }
-
-// ✅ New Method: Get full recipes details for favorites
-export async function getFavoriteRecipesList() {
-  const favoriteIds = getFavoriteRecipes();
-  if (!favoriteIds.length) return [];
-
-  const idsQuery = favoriteIds.join(",");
-  const response = await fetch(`/api/recipes?ids=${idsQuery}`);
-  
-  if (!response.ok) return [];
-
-  const recipes = await response.json();
-  return recipes;
-}

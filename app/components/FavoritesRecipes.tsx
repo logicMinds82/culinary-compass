@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getFavoriteRecipesList, removeFavoriteRecipe } from "@/app/api/favoritesAPI";
+import { getFavoriteRecipes, removeFavoriteRecipe } from "@/app/api/favoritesAPI";
 import RecipeCard from "./RecipeCard";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 
@@ -12,8 +12,26 @@ interface Recipe {
   image: string;
   description: string;
   cookingTime: string;
+  categories: string[];
+  difficulty: string;
+  servings: number;
   ratings: number;
   reviews: number;
+}
+
+async function fetchRecipesByIds(ids: number[]): Promise<Recipe[]> {
+  if (ids.length === 0) return [];
+  
+  try {
+    const idsQuery = ids.join(",");
+    const response = await fetch(`/api/recipes-by-ids?ids=${idsQuery}`);
+    
+    if (!response.ok) return [];
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching favorite recipes:", error);
+    return [];
+  }
 }
 
 export default function FavoriteRecipes() {
@@ -22,7 +40,8 @@ export default function FavoriteRecipes() {
 
   useEffect(() => {
     async function loadFavorites() {
-      const favorites = await getFavoriteRecipesList();
+      const favoriteIds = getFavoriteRecipes();
+      const favorites = await fetchRecipesByIds(favoriteIds);
       setRecipes(favorites);
       setLoading(false);
     }

@@ -1,67 +1,71 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Clock, Gauge } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import LoadingSpinner from "@/app/components/LoadingSpinner";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { getRecipeBySlug, getRelatedRecipes } from "@/app/services/recipeService";
 
-interface Recipe {
-  id: number;
-  slug: string;
-  title: string;
-  image: string;
-  description: string;
-  difficulty: string;
-  cookingTime: string;
-  servings: number;
-  categories: string[];
-  ingredients: string[];
-  steps: string[];
-  ratings: number;
-  reviews: number;
-  author_name: string;
-  date_added: string;
+interface PageProps {
+  params: Promise<{
+    slug: string;
+  }>;
 }
 
-export default function SingleRecipePage() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
-
-  useEffect(() => {
-    async function fetchRecipe() {
-      const res = await fetch(`/api/recipes?slug=${slug}`, { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        setRecipe(data);
-
-        const relatedRes = await fetch(`/api/recipes?category=${encodeURIComponent(data.categories[0])}`);
-        const relatedData = await relatedRes.json();
-        setRelatedRecipes(relatedData.filter((r: Recipe) => r.slug !== slug).slice(0, 3));
-      } else {
-        setRecipe(null);
-      }
-      setLoading(false);
-    }
-
-    fetchRecipe();
-  }, [slug]);
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const recipe = await getRecipeBySlug(slug);
 
   if (!recipe) {
-    return <div className="text-center py-16 text-xl">Recipe not found.</div>;
+    return {
+      title: "Recipe Not Found - Culinary Compass",
+      description: "The recipe you're looking for could not be found.",
+    };
   }
 
-  console.log(recipe)
+  return {
+    title: `${recipe.title} - Culinary Compass`,
+    description: recipe.description,
+    keywords: [
+      recipe.title,
+      ...recipe.categories,
+      recipe.difficulty,
+      "recipe",
+      "cooking",
+      "culinary compass",
+    ],
+    openGraph: {
+      title: recipe.title,
+      description: recipe.description,
+      images: [
+        {
+          url: recipe.image,
+          width: 1200,
+          height: 630,
+          alt: recipe.title,
+        },
+      ],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: recipe.title,
+      description: recipe.description,
+      images: [recipe.image],
+    },
+  };
+}
+
+export default async function SingleRecipePage({ params }: PageProps) {
+  const { slug } = await params;
+  const recipe = await getRecipeBySlug(slug);
+
+  if (!recipe) {
+    notFound();
+  }
+
+  const relatedRecipes = await getRelatedRecipes(recipe.categories[0], slug);
 
   return (
     <section className="container mx-auto px-4 py-12">
