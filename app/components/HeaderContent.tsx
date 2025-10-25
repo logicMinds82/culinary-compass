@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, LogOut, ChefHat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "./AuthProvider";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface MenuItem {
   label: string;
@@ -17,6 +26,11 @@ const menuItemsLoggedOut: MenuItem[] = [
   { label: "Homepage", uniqueKey: "homepage", href: "/" },
   { label: "Recipes", uniqueKey: "recipes", href: "/recipes" },
   { label: "News", uniqueKey: "news", href: "/news" },
+  {
+    label: "Favorite Recipes",
+    uniqueKey: "favoriteRecipes",
+    href: "/favorite-recipes",
+  },
   { label: "Contacts", uniqueKey: "contactUs", href: "/contactus" },
 ];
 
@@ -24,13 +38,16 @@ const menuItemsLoggedIn: MenuItem[] = [
   { label: "Homepage", uniqueKey: "homepage", href: "/" },
   { label: "Recipes", uniqueKey: "recipes", href: "/recipes" },
   { label: "Submit Recipe", uniqueKey: "submitRecipe", href: "/submit-recipe" },
-  { label: "Favorite Recipes", uniqueKey: "favoriteRecipes", href: "/favorite-recipes" },
+  {
+    label: "Favorite Recipes",
+    uniqueKey: "favoriteRecipes",
+    href: "/favorite-recipes",
+  },
   { label: "News", uniqueKey: "news", href: "/news" },
   { label: "Contacts", uniqueKey: "contactUs", href: "/contactus" },
 ];
 
 const HeaderContent = () => {
-
   const { user, profile, loading } = useAuth();
 
   const menuItems = user ? menuItemsLoggedIn : menuItemsLoggedOut;
@@ -38,15 +55,19 @@ const HeaderContent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [closeTimeout, setCloseTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [mobileDropdowns, setMobileDropdowns] = useState<{ [key: string]: boolean }>({});
+  const [mobileDropdowns, setMobileDropdowns] = useState<{
+    [key: string]: boolean;
+  }>({});
 
-  // Show loading skeleton until auth data is fetched
   if (loading) {
     return (
       <>
         <div>
           <h1 className="text-2xl font-bold">
-            <Link href="/" className="text-foreground hover:text-primary transition-colors">
+            <Link
+              href="/"
+              className="text-foreground hover:text-primary transition-colors"
+            >
               Culinary Compass
             </Link>
           </h1>
@@ -63,11 +84,8 @@ const HeaderContent = () => {
         </Button>
 
         <nav className="hidden lg:flex items-center justify-center space-x-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="h-4 w-16 bg-muted rounded animate-pulse"
-            />
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-4 w-16 bg-muted rounded animate-pulse" />
           ))}
         </nav>
 
@@ -103,21 +121,23 @@ const HeaderContent = () => {
     <>
       <div>
         <h1 className="text-2xl font-bold">
-          <Link href="/" className="text-foreground hover:text-primary transition-colors">
+          <Link
+            href="/"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Culinary Compass
           </Link>
         </h1>
         <strong className="fontNormal text-primary">Recipe Collection</strong>
       </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="lg:hidden text-primary"
-        onClick={() => setIsMenuOpen((prev) => !prev)}
-      >
-        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-      </Button>
+      <button className="lg:hidden text-primary">
+        {isMenuOpen ? (
+          <X size={32} onClick={() => setIsMenuOpen((prev) => !prev)} />
+        ) : (
+          <Menu size={32} onClick={() => setIsMenuOpen((prev) => !prev)} />
+        )}
+      </button>
 
       <nav
         className={`z-[-1] absolute lg:inset-x-0 lg:top-1/2 lg:translate-y-[-50%] top-16 left-0 w-full lg:w-auto lg:mt-0 bg-background lg:bg-transparent lg:flex flex-col lg:flex-row items-start lg:items-center lg:justify-center p-6 lg:p-0 transition-all border-b lg:border-0 ${
@@ -127,14 +147,19 @@ const HeaderContent = () => {
         {menuItems.map((item) => {
           const { label, href, submenu, uniqueKey } = item;
           const hasSubmenu = submenu && submenu.length > 0;
-          const isSubmenuOpen = activeDropdown === uniqueKey || mobileDropdowns[uniqueKey || ""];
+          const isSubmenuOpen =
+            activeDropdown === uniqueKey || mobileDropdowns[uniqueKey || ""];
 
           return (
             <div
               key={uniqueKey || label}
               className="relative lg:block"
-              onMouseEnter={() => hasSubmenu && handleMouseEnter(uniqueKey || "")}
-              onMouseLeave={() => hasSubmenu && handleMouseLeave(uniqueKey || "")}
+              onMouseEnter={() =>
+                hasSubmenu && handleMouseEnter(uniqueKey || "")
+              }
+              onMouseLeave={() =>
+                hasSubmenu && handleMouseLeave(uniqueKey || "")
+              }
             >
               <div className="flex items-center justify-between lg:inline-block">
                 <Link
@@ -143,7 +168,9 @@ const HeaderContent = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {label}
-                  {hasSubmenu && <ChevronDown size={16} className="ml-1 hidden lg:inline" />}
+                  {hasSubmenu && (
+                    <ChevronDown size={16} className="ml-1 hidden lg:inline" />
+                  )}
                 </Link>
                 {hasSubmenu && (
                   <Button
@@ -152,14 +179,20 @@ const HeaderContent = () => {
                     className="lg:hidden text-primary h-8 w-8"
                     onClick={() => toggleMobileDropdown(uniqueKey || "")}
                   >
-                    {isSubmenuOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    {isSubmenuOpen ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronDown size={20} />
+                    )}
                   </Button>
                 )}
               </div>
               {hasSubmenu && submenu && (
                 <div
                   className={`lg:absolute left-0 top-full lg:bg-primary rounded-md shadow-lg transition-opacity duration-200 ${
-                    isSubmenuOpen ? "opacity-100 visible block" : "opacity-0 invisible hidden"
+                    isSubmenuOpen
+                      ? "opacity-100 visible block"
+                      : "opacity-0 invisible hidden"
                   } flex flex-col w-48 pl-4 lg:pl-0 overflow-hidden`}
                 >
                   {submenu.map((subItem) => (
@@ -181,18 +214,57 @@ const HeaderContent = () => {
 
       <div className="flex items-center space-x-4">
         {user ? (
-          <>
-            <span className="hidden text-foreground lg:inline text-sm">
-              Welcome, {profile?.full_name || user.email}
-            </span>
-            <div>
-              <form action="/api/auth/signout" method="POST">
-                <Button type="submit" className="bg-primary hover:bg-primary-hover cursor-pointer">
-                  Logout
-                </Button>
-              </form>
-            </div>
-          </>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="relative h-10 w-10 rounded-full"
+              >
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {profile?.full_name
+                      ? profile.full_name.charAt(0).toUpperCase()
+                      : user.email?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {profile?.full_name || "User"}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user.email}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/my-recipes" className="cursor-pointer">
+                  <ChefHat className="mr-2 h-4 w-4" />
+                  <span>My Recipes</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <form
+                  action="/api/auth/signout"
+                  method="POST"
+                  className="w-full"
+                >
+                  <button
+                    type="submit"
+                    className="flex w-full items-center cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </form>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <Button asChild className="bg-primary hover:bg-primary-hover">
             <Link href="/login">Login</Link>

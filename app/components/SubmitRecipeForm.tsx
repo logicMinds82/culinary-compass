@@ -3,6 +3,7 @@
 import { useState, FormEvent, useEffect } from "react";
 import Image from "next/image";
 import { postRecipeAction } from "../actions/postRecipeAction";
+import { updateRecipeAction } from "../actions/updateRecipeAction";
 import { useAuth } from "./AuthProvider";
 import { DifficultyEnum } from "../types/DifficultyEnum";
 import { CategoryEnum } from "../types/CategoryEnum";
@@ -29,16 +30,27 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, Plus, X, CheckCircle, AlertCircle } from "lucide-react";
 
-export default function SubmitRecipeForm() {
-  const { user } = useAuth();
+interface SubmitRecipeFormProps {
+  recipeId?: number;
+}
 
+export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
+  const { user } = useAuth();
+  const isEditMode = !!recipeId;
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [cookingTime, setCookingTime] = useState("");
+  const [servings, setServings] = useState<number | "">(4);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [statusType, setStatusType] = useState<"success" | "error" | null>(
     null
   );
   const [loading, setLoading] = useState(false);
+  const [loadingRecipe, setLoadingRecipe] = useState(false);
   const [difficulty, setDifficulty] = useState<DifficultyEnum>(
     DifficultyEnum.Easy
   );
@@ -48,15 +60,53 @@ export default function SubmitRecipeForm() {
   const [currentIngredient, setCurrentIngredient] = useState("");
   const [currentStep, setCurrentStep] = useState("");
 
+  // Load recipe data if in edit mode
+  useEffect(() => {
+    if (recipeId && user) {
+      loadRecipeData(recipeId);
+    }
+  }, [recipeId, user]);
+
+  const loadRecipeData = async (id: number) => {
+    try {
+      setLoadingRecipe(true);
+      const response = await fetch(`/api/recipe/${id}`);
+      
+      if (!response.ok) {
+        throw new Error("Failed to load recipe");
+      }
+
+      const recipe = await response.json();
+      
+      // Populate form with recipe data
+      setTitle(recipe.title || "");
+      setDescription(recipe.description || "");
+      setDifficulty(recipe.difficulty || DifficultyEnum.Easy);
+      setCategories(recipe.categories || []);
+      setIngredients(recipe.ingredients || []);
+      setSteps(recipe.steps || []);
+      setCookingTime(recipe.cookingTime || "");
+      setServings(recipe.servings || 4);
+      setExistingImageUrl(recipe.image || null);
+      setImagePreview(recipe.image || null);
+    } catch (error) {
+      console.error("Error loading recipe:", error);
+      setStatus("Failed to load recipe data");
+      setStatusType("error");
+    } finally {
+      setLoadingRecipe(false);
+    }
+  };
+
   useEffect(() => {
     if (image) {
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(image);
-    } else {
+    } else if (!existingImageUrl) {
       setImagePreview(null);
     }
-  }, [image]);
+  }, [image, existingImageUrl]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,48 +134,85 @@ export default function SubmitRecipeForm() {
       return;
     }
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const file = formData.get("image") as File;
-
     setLoading(true);
-    const result = await postRecipeAction({
-      title: formData.get("title") as string,
-      description: formData.get("description") as string,
-      difficulty: difficulty,
-      categories: categories,
-      ingredients: ingredients,
-      steps: steps,
-      cookingTime: formData.get("cookingTime") as string,
-      servings: Number(formData.get("servings")),
-      authorId: user.id,
-      authorName: user.user_metadata?.full_name || user.email || "Anonymous",
-      imageFile: file && file.size > 0 ? file : null,
-    });
-    setLoading(false);
 
-    if (result.success) {
-      setStatus("Recipe posted successfully! 🎉");
-      setStatusType("success");
-      setImage(null);
-      setImagePreview(null);
-      setCategories([]);
-      setIngredients([]);
-      setSteps([]);
-      setCurrentIngredient("");
-      setCurrentStep("");
-      setDifficulty(DifficultyEnum.Easy);
-      form.reset();
-      setTimeout(() => {
-        setStatus(null);
-        setStatusType(null);
-      }, 5000);
-    } else {
-      setStatus(
-        String(result.error) ||
-          "Failed to submit recipe. Please try again later."
-      );
+    try {
+      let result;
+
+      if (isEditMode && recipeId) {
+        // Update existing recipe
+        result = await updateRecipeAction({
+          id: recipeId,
+          title,
+          description,
+          difficulty,
+          categories,
+          ingredients,
+          steps,
+          cookingTime,
+          servings: Number(servings),
+          imageFile: image,
+          existingImageUrl,
+        });
+      } else {
+        // Create new recipe
+        result = await postRecipeAction({
+          title,
+          description,
+          difficulty,
+          categories,
+          ingredients,
+          steps,
+          cookingTime,
+          servings: Number(servings),
+          authorId: user.id,
+          authorName: user.user_metadata?.full_name || user.email || "Anonymous",
+          imageFile: image,
+        });
+      }
+
+      if (result.success) {
+        setStatus(
+          isEditMode
+            ? "Recipe updated successfully! 🎉"
+            : "Recipe posted successfully! 🎉"
+        );
+        setStatusType("success");
+        
+        if (!isEditMode) {
+          // Reset form only for new recipes
+          setTitle("");
+          setDescription("");
+          setCookingTime("");
+          setServings(4);
+          setImage(null);
+          setImagePreview(null);
+          setExistingImageUrl(null);
+          setCategories([]);
+          setIngredients([]);
+          setSteps([]);
+          setCurrentIngredient("");
+          setCurrentStep("");
+          setDifficulty(DifficultyEnum.Easy);
+        }
+        
+        setTimeout(() => {
+          setStatus(null);
+          setStatusType(null);
+        }, 5000);
+      } else {
+        setStatus(
+          String(result.error) ||
+            `Failed to ${isEditMode ? "update" : "submit"} recipe. Please try again later.`
+        );
+        setStatusType("error");
+      }
+    } catch (error) {
+      console.error("Error submitting recipe:", error);
+      setStatus("An unexpected error occurred. Please try again.");
       setStatusType("error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,116 +252,132 @@ export default function SubmitRecipeForm() {
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-4xl">
-              Submit <span className="text-primary">Your Recipe</span>
+              {isEditMode ? "Edit" : "Submit"}{" "}
+              <span className="text-primary">Your Recipe</span>
             </CardTitle>
             <CardDescription>
-              Share your culinary creation with the community. Fill out the form
-              below to submit your recipe.
+              {isEditMode
+                ? "Update your recipe details below."
+                : "Share your culinary creation with the community. Fill out the form below to submit your recipe."}
             </CardDescription>
           </CardHeader>
 
           <CardContent>
-            {status && (
-              <div
-                className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${
-                  statusType === "success"
-                    ? "bg-success/10 border border-success/20 text-success"
-                    : "bg-destructive/10 border border-destructive/20 text-destructive"
-                }`}
-              >
-                {statusType === "success" ? (
-                  <CheckCircle className="w-5 h-5" />
-                ) : (
-                  <AlertCircle className="w-5 h-5" />
-                )}
-                <span className="font-semibold">{status}</span>
+            {loadingRecipe ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-foreground">
-                  Basic Information
-                </h3>
-                <Separator />
-
-                <div className="space-y-2">
-                  <Label htmlFor="title">
-                    Recipe Title <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="title"
-                    name="title"
-                    type="text"
-                    placeholder="e.g., Classic Spaghetti Carbonara"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">
-                    Description <span className="text-destructive">*</span>
-                  </Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    rows={4}
-                    placeholder="Describe your recipe, what makes it special..."
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2 w-full [&>button]:w-full">
-                  <Label htmlFor="difficulty">
-                    Difficulty <span className="text-destructive">*</span>
-                  </Label>
-                  <Select
-                    value={difficulty}
-                    onValueChange={(value) =>
-                      setDifficulty(value as DifficultyEnum)
-                    }
+            ) : (
+              <>
+                {status && (
+                  <div
+                    className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${
+                      statusType === "success"
+                        ? "bg-success/10 border border-success/20 text-success"
+                        : "bg-destructive/10 border border-destructive/20 text-destructive"
+                    }`}
                   >
-                    <SelectTrigger id="difficulty">
-                      <SelectValue placeholder="Select difficulty" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={DifficultyEnum.Easy}>Easy</SelectItem>
-                      <SelectItem value={DifficultyEnum.Medium}>
-                        Medium
-                      </SelectItem>
-                      <SelectItem value={DifficultyEnum.Hard}>Hard</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    {statusType === "success" ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      <AlertCircle className="w-5 h-5" />
+                    )}
+                    <span className="font-semibold">{status}</span>
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="cookingTime">
-                    Cooking Time <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="cookingTime"
-                    name="cookingTime"
-                    type="text"
-                    placeholder="e.g., 30 minutes"
-                    required
-                  />
-                </div>
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  {/* Basic Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-semibold text-foreground">
+                      Basic Information
+                    </h3>
+                    <Separator />
 
-                <div className="space-y-2">
-                  <Label htmlFor="servings">
-                    Servings <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="servings"
-                    name="servings"
-                    type="number"
-                    min="1"
-                    placeholder="e.g., 4"
-                    required
-                  />
-                </div>
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="title">
+                        Recipe Title <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="title"
+                        name="title"
+                        type="text"
+                        placeholder="e.g., Classic Spaghetti Carbonara"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description">
+                        Description <span className="text-destructive">*</span>
+                      </Label>
+                      <Textarea
+                        id="description"
+                        name="description"
+                        rows={4}
+                        placeholder="Describe your recipe, what makes it special..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2 w-full [&>button]:w-full">
+                      <Label htmlFor="difficulty">
+                        Difficulty <span className="text-destructive">*</span>
+                      </Label>
+                      <Select
+                        value={difficulty}
+                        onValueChange={(value) =>
+                          setDifficulty(value as DifficultyEnum)
+                        }
+                      >
+                        <SelectTrigger id="difficulty">
+                          <SelectValue placeholder="Select difficulty" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={DifficultyEnum.Easy}>Easy</SelectItem>
+                          <SelectItem value={DifficultyEnum.Medium}>
+                            Medium
+                          </SelectItem>
+                          <SelectItem value={DifficultyEnum.Hard}>Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="cookingTime">
+                        Cooking Time <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="cookingTime"
+                        name="cookingTime"
+                        type="text"
+                        placeholder="e.g., 30 minutes"
+                        value={cookingTime}
+                        onChange={(e) => setCookingTime(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="servings">
+                        Servings <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="servings"
+                        name="servings"
+                        type="number"
+                        min="1"
+                        placeholder="e.g., 4"
+                        value={servings}
+                        onChange={(e) => setServings(e.target.value ? parseInt(e.target.value) : "")}
+                        required
+                      />
+                    </div>
+                  </div>
 
               {/* Image Upload */}
               <div className="space-y-4">
@@ -492,13 +595,21 @@ export default function SubmitRecipeForm() {
                   size="lg"
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {loading ? "Submitting Recipe..." : "Submit Recipe"}
+                  {loading
+                    ? isEditMode
+                      ? "Updating Recipe..."
+                      : "Submitting Recipe..."
+                    : isEditMode
+                    ? "Update Recipe"
+                    : "Submit Recipe"}
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
-  );
+          </>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+</section>
+);
 }
