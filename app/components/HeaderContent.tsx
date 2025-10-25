@@ -25,13 +25,11 @@ interface MenuItem {
 const menuItemsLoggedOut: MenuItem[] = [
   { label: "Homepage", uniqueKey: "homepage", href: "/" },
   { label: "Recipes", uniqueKey: "recipes", href: "/recipes" },
-  { label: "News", uniqueKey: "news", href: "/news" },
   {
     label: "Favorite Recipes",
     uniqueKey: "favoriteRecipes",
     href: "/favorite-recipes",
   },
-  { label: "Contacts", uniqueKey: "contactUs", href: "/contactus" },
 ];
 
 const menuItemsLoggedIn: MenuItem[] = [
@@ -43,8 +41,6 @@ const menuItemsLoggedIn: MenuItem[] = [
     uniqueKey: "favoriteRecipes",
     href: "/favorite-recipes",
   },
-  { label: "News", uniqueKey: "news", href: "/news" },
-  { label: "Contacts", uniqueKey: "contactUs", href: "/contactus" },
 ];
 
 const HeaderContent = () => {
@@ -218,7 +214,7 @@ const HeaderContent = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-10 w-10 rounded-full"
+                className="relative h-10 w-10 rounded-full cursor-pointer"
               >
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-primary text-primary-foreground">

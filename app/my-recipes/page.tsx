@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../components/AuthProvider";
 import RecipeCard from "../components/RecipeCard";
 import Link from "next/link";
-import { 
-  Card, 
-  CardContent, 
+import {
+  Card,
+  CardContent,
   CardDescription,
-  CardHeader, 
-  CardTitle 
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Loader2, ChefHat } from "lucide-react";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 interface Recipe {
   id: number;
@@ -63,7 +64,7 @@ export default function MyRecipesPage() {
     try {
       setLoading(true);
       const response = await fetch("/api/my-recipes");
-      
+
       if (!response.ok) {
         throw new Error("Failed to fetch recipes");
       }
@@ -116,13 +117,7 @@ export default function MyRecipesPage() {
   };
 
   if (authLoading || loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) {
@@ -146,7 +141,8 @@ export default function MyRecipesPage() {
           <CardHeader>
             <CardTitle>No recipes yet</CardTitle>
             <CardDescription>
-              You haven&apos;t submitted any recipes yet. Start sharing your culinary creations!
+              You haven&apos;t submitted any recipes yet. Start sharing your
+              culinary creations!
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -183,12 +179,15 @@ export default function MyRecipesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your recipe
-              &quot;{recipeToDelete?.title}&quot; and remove it from our servers.
+              This action cannot be undone. This will permanently delete your
+              recipe &quot;{recipeToDelete?.title}&quot; and remove it from our
+              servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer" disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer" disabled={deleting}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
               disabled={deleting}

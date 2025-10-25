@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Star, Clock, Gauge } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 interface Recipe {
   id: number;
@@ -22,8 +23,8 @@ interface Recipe {
   steps: string[];
   ratings: number;
   reviews: number;
-  author: string;
-  dateAdded: string;
+  author_name: string;
+  date_added: string;
 }
 
 export default function SingleRecipePage() {
@@ -53,12 +54,14 @@ export default function SingleRecipePage() {
   }, [slug]);
 
   if (loading) {
-    return <div className="text-center py-16 text-xl">Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   if (!recipe) {
     return <div className="text-center py-16 text-xl">Recipe not found.</div>;
   }
+
+  console.log(recipe)
 
   return (
     <section className="container mx-auto px-4 py-12">
@@ -102,7 +105,7 @@ export default function SingleRecipePage() {
           </div>
 
           <div className="border-t border-border pt-3 text-sm text-muted-foreground">
-            <span>By {recipe.author} • Published on {recipe.dateAdded}</span>
+            <span>By {recipe["author_name"]} • Published on {recipe["date_added"]}</span>
           </div>
         </div>
       </Card>

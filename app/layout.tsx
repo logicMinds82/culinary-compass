@@ -22,7 +22,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Header />
-          <main className="w-full mx-auto">{children}</main>
+          <main className="w-full mx-auto min-h-[calc(100vh-73px)]">{children}</main>
           <Footer />
         </AuthProvider>
       </body>

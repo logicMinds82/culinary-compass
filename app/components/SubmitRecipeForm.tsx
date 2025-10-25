@@ -71,7 +71,7 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
     try {
       setLoadingRecipe(true);
       const response = await fetch(`/api/recipe/${id}`);
-      
+
       if (!response.ok) {
         throw new Error("Failed to load recipe");
       }
@@ -591,7 +591,7 @@ export default function SubmitRecipeForm({ recipeId }: SubmitRecipeFormProps) {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-primary hover:bg-primary-hover"
+                  className="flex-1 bg-primary hover:bg-primary-hover cursor-pointer"
                   size="lg"
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

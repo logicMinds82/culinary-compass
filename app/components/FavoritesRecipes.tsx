@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getFavoriteRecipesList, removeFavoriteRecipe } from "@/app/api/favoritesAPI";
 import RecipeCard from "./RecipeCard";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 interface Recipe {
   id: number;
@@ -17,11 +18,13 @@ interface Recipe {
 
 export default function FavoriteRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function loadFavorites() {
       const favorites = await getFavoriteRecipesList();
       setRecipes(favorites);
+      setLoading(false);
     }
 
     loadFavorites();
@@ -31,6 +34,10 @@ export default function FavoriteRecipes() {
     removeFavoriteRecipe(id);
     setRecipes(recipes.filter((recipe) => recipe.id !== id));
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   if (recipes.length === 0) {
     return <div className="text-center py-8">No favorite recipes found.</div>;

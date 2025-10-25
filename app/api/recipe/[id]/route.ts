@@ -19,7 +19,7 @@ export async function GET(
       );
     }
 
-    const recipeId = await params;
+    const recipeId = (await params).id;
 
     // Fetch the recipe
     const { data: recipe, error } = await supabase
