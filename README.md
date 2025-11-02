@@ -90,7 +90,6 @@ Open http://localhost:3000
 
 - Auth via secure Supabase session cookies.
 - Server-side validation of form payloads.
-- ReCAPTCHA integration for contact form abuse prevention.
 - Graceful error boundaries: [`app/error.tsx`](app/error.tsx).
 - Protected routes redirect unauthenticated users (e.g. [`app/submit-recipe/page.tsx`](app/submit-recipe/page.tsx), [`app/my-recipes/page.tsx`](app/my-recipes/page.tsx)).
 
@@ -114,6 +113,7 @@ Open http://localhost:3000
 - Rating & commenting system
 - Social sharing integration
 - Advanced nutrition tagging
+- ReCAPTCHA integration for contact form abuse prevention.
 - Pagination via database queries
 
 ## Contributing
